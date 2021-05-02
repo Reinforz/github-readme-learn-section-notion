@@ -1,0 +1,11 @@
+name: "Github Action Readme Learn Section"
+description: "Populates the learning section in your github readme with data from notion"
+author: devorein
+
+branding:
+  icon: "box"
+  color: "gray-dark"
+
+runs:
+  using: "node12"
+  main: "dist/index.js"
