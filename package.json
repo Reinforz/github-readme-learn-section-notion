@@ -1,0 +1,24 @@
+{
+  "name": "github-action-learn-section-notion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build index.js --license licenses.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devorein/github-action-learn-section-notion.git"
+  },
+  "keywords": [],
+  "author": "Safwan Shaheer <devorein00@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Devorein/github-action-learn-section-notion/issues"
+  },
+  "homepage": "https://github.com/Devorein/github-action-learn-section-notion#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.7",
+    "@nishans/endpoints": "^0.0.32"
+  }
+}
