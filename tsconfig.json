@@ -6,6 +6,7 @@
       "dom",
       "esnext"
     ],
+    "rootDir": "./src",
     "strict": false,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -30,8 +31,5 @@
   },
   "exclude": [
     "node_modules"
-  ],
-  "include": [
-    "./src/**/*.ts"
   ]
 }

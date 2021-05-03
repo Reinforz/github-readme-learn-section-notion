@@ -1,16 +1,9 @@
-import core from '@actions/core';
-import { NotionEndpoints } from '@nishans/endpoints';
-import {
-  ICollection,
-  ICollectionViewPage,
-  IPage,
-  MultiSelectSchemaUnit,
-  TTextColor
-} from '@nishans/types';
-import fs from 'fs';
-import { commitFile } from './utils';
+const core = require('@actions/core');
+const { NotionEndpoints } = require('@nishans/endpoints');
+const fs = require('fs');
+const { commitFile } = require('./utils');
 
-const ColorMap: Record<TTextColor, string> = {
+const ColorMap = {
   default: '505558',
   gray: '979a9b',
   brown: '695b55',
@@ -21,7 +14,7 @@ const ColorMap: Record<TTextColor, string> = {
   purple: '6c598f',
   pink: '904d74',
   red: '9f5c58'
-} as any;
+};
 
 async function main() {
   try {
@@ -46,8 +39,7 @@ async function main() {
 
     core.info('Fetched database');
 
-    const collectionView = collectionViewData.recordMap.block![databaseId]
-      .value as ICollectionViewPage;
+    const collectionView = collectionViewData.recordMap.block[databaseId].value;
 
     // If a database with the passed id doesn't exist
     if (!collectionView) {
@@ -95,8 +87,7 @@ async function main() {
 
     core.info('Fetched rows');
 
-    const collection = collectionData.recordMap.collection![collection_id]!
-      .value as ICollection;
+    const collection = collectionData.recordMap.collection[collection_id].value;
     const { schema } = collection;
 
     // Validate collection schema
@@ -105,14 +96,14 @@ async function main() {
         ([, schema_entry_value]) =>
           schema_entry_value.type === 'multi_select' &&
           schema_entry_value.name === 'Category'
-      ) as [string, MultiSelectSchemaUnit];
+      );
 
     if (!category_schema_entry)
       return core.setFailed(
         "Couldn't find Category named multi_select type column in the database"
       );
 
-    const rows = (Object.values(recordMap.block) as { value: IPage }[])
+    const rows = Object.values(recordMap.block)
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
@@ -127,10 +118,7 @@ async function main() {
           categoryA.value > categoryB.value ? 1 : -1
         );
 
-      const categories_map: Map<
-        string,
-        { items: string[]; color: TTextColor; value: string }
-      > = new Map();
+      const categories_map = new Map();
 
       categories.forEach((category) => {
         categories_map.set(category.value, {
@@ -142,7 +130,7 @@ async function main() {
       rows.forEach((row) => {
         const category = row.properties[category_schema_entry[0]][0][0];
         if (!category) throw new Error('Each row must have a category value');
-        const category_value = categories_map.get(category)!;
+        const category_value = categories_map.get(category);
         category_value.items.push(row.properties.title[0][0]);
       });
 
