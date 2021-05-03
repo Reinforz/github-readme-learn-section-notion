@@ -1,11 +1,12 @@
 {
   "name": "github-action-learn-section-notion",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A github action to populate readme learn section with data fetched from a remote notion database",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "ncc build src/index.js --license licenses.txt",
-    "prepare": "husky install"
+    "build": "npx ncc build ./src/index.js -o dist",
+    "prepare": "husky install",
+    "format": "npx prettier --write src/*.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,9 @@
   "dependencies": {
     "@actions/core": "^1.2.7",
     "@nishans/endpoints": "^0.0.32"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.22.3",
+    "prettier": "^2.2.1"
   }
 }
