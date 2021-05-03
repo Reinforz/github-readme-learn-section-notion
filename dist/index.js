@@ -16783,7 +16783,7 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const README_PATH = './README.md';
+    const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
     core.info(`Reading from ${README_PATH}`);
 
     const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
