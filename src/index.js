@@ -6,6 +6,8 @@ const { commitFile } = require('./utils');
 async function main() {
   try {
     const databaseId = core.getInput('database_id');
+    const NOTION_TOKEN_V2 = core.getInput('token_v2');
+
     const collectionViewData = await NotionEndpoints.Queries.syncRecordValues(
       {
         requests: [
@@ -17,7 +19,7 @@ async function main() {
         ]
       },
       {
-        token: process.secrets.NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2
       }
     );
 
@@ -43,7 +45,7 @@ async function main() {
         ]
       },
       {
-        token: process.secrets.NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2
       }
     );
 
@@ -62,7 +64,7 @@ async function main() {
         }
       },
       {
-        token: process.secrets.NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2
       }
     );
 
