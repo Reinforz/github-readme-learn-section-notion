@@ -21013,6 +21013,14 @@ module.exports = require("path");;
 
 /***/ }),
 
+/***/ 1191:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("querystring");;
+
+/***/ }),
+
 /***/ 2413:
 /***/ ((module) => {
 
@@ -21104,6 +21112,7 @@ const core = __nccwpck_require__(2186);
 const { NotionEndpoints } = __nccwpck_require__(1109);
 const fs = __nccwpck_require__(5747);
 const { commitFile } = __nccwpck_require__(1608);
+const qs = __nccwpck_require__(1191);
 
 const ColorMap = {
   default: '505558',
@@ -21198,11 +21207,20 @@ async function main() {
         ([, schema_entry_value]) =>
           schema_entry_value.type === 'multi_select' &&
           schema_entry_value.name === 'Category'
+      ),
+      color_schema_entry = schema_entries.find(
+        ([, schema_entry_value]) =>
+          schema_entry_value.type === 'text' &&
+          schema_entry_value.name === 'Color'
       );
 
     if (!category_schema_entry)
       return core.setFailed(
         "Couldn't find Category named multi_select type column in the database"
+      );
+    if (!category_schema_entry)
+      return core.setFailed(
+        "Couldn't find Color named text type column in the database"
       );
 
     const rows = Object.values(recordMap.block)
@@ -21240,13 +21258,15 @@ async function main() {
 
       for (const [category, category_info] of categories_map) {
         const content = [
-          `<div><img height="20px" src="https://img.shields.io/badge/${category}-${
+          `<h3><img height="20px" src="https://img.shields.io/badge/${category}-${
             ColorMap[category_info.color]
-          }"/></div>`
+          }"/></h3>`
         ];
         category_info.items.forEach((item) =>
           content.push(
-            `<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`
+            `<img src="https://img.shields.io/badge/-${qs.stringify(item)}-${
+              item.properties[color_schema_entry[0]][0][0]
+            }?style=flat-square&amp;logo=${qs.stringify(item)}" alt="${item}"/>`
           )
         );
         newLines.push(...content, '<hr>');
