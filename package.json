@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "npm run format && npm run transpile",
-    "build": "npx ncc build ./build/index.js -o dist",
+    "build": "npx ncc build ./src/index.ts -o dist",
     "format": "npx prettier --write src/*.ts",
     "transpile": "npx tsc"
   },
