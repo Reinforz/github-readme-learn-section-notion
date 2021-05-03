@@ -91,79 +91,86 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const categories = category_schema_entry[1].options
-      .map((option) => ({
-        color: option.color,
-        value: option.value
-      }))
-      .sort((categoryA, categoryB) =>
-        categoryA.value > categoryB.value ? 1 : -1
-      );
+    if (rows.length === 0) return core.warn('No database rows detected');
+    else {
+      const categories = category_schema_entry[1].options
+        .map((option) => ({
+          color: option.color,
+          value: option.value
+        }))
+        .sort((categoryA, categoryB) =>
+          categoryA.value > categoryB.value ? 1 : -1
+        );
 
-    const categories_map = new Map();
+      const categories_map = new Map();
 
-    categories.forEach((category) => {
-      categories_map.set(category.value, {
-        items: [],
-        ...category
+      categories.forEach((category) => {
+        categories_map.set(category.value, {
+          items: [],
+          ...category
+        });
       });
-    });
 
-    rows.forEach((row) => {
-      const category = row.properties[category_schema_entry[0]][0][0];
-      if (!category) throw new Error('Each row must have a category value');
-      const category_value = categories_map.get(category);
-      category_value.items.push(row.properties.title[0][0]);
-    });
+      rows.forEach((row) => {
+        const category = row.properties[category_schema_entry[0]][0][0];
+        if (!category) throw new Error('Each row must have a category value');
+        const category_value = categories_map.get(category);
+        category_value.items.push(row.properties.title[0][0]);
+      });
 
-    const newLines = [];
+      const newLines = [];
 
-    for (const [category, category_info] of categories_map) {
-      const content = [
-        `<img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/>`,
-        '</br>'
+      for (const [category, category_info] of categories_map) {
+        const content = [
+          `<div><img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/></div>`
+        ];
+        category_info.items.forEach((item) =>
+          content.push(
+            `<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`
+          )
+        );
+        newLines.push(...content, '<hr>');
+      }
+
+      const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
+      core.info(`Reading from ${README_PATH}`);
+
+      const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
+      let startIdx = readmeLines.findIndex(
+        (content) => content.trim() === '<!--START_SECTION:learn-->'
+      );
+
+      if (startIdx === -1) {
+        return core.setFailed(
+          `Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`
+        );
+      }
+
+      if (endIdx === -1) {
+        return core.setFailed(
+          `Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`
+        );
+      }
+
+      const endIdx = readmeLines.findIndex(
+        (content) => content.trim() === '<!--END_SECTION:learn-->'
+      );
+
+      const finalLines = [
+        ...readmeLines.slice(0, startIdx + 1),
+        ...newLines,
+        ...readmeLines.slice(endIdx)
       ];
-      category_info.items.forEach((item) =>
-        content.push(
-          `<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`
-        )
-      );
-      newLines.push(...content, '</br>');
-    }
 
-    const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
-    core.info(`Reading from ${README_PATH}`);
+      core.info(`Writing to ${README_PATH}`);
 
-    const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
-    let startIdx = readmeLines.findIndex(
-      (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
-    );
+      fs.writeFileSync(README_PATH, finalLines.join('\n'));
 
-    if (startIdx === -1) {
-      return core.setFailed(
-        `Couldn't find the <!--START_SECTION:notion_learn--> comment. Exiting!`
-      );
-    }
-
-    const endIdx = readmeLines.findIndex(
-      (content) => content.trim() === '<!--END_SECTION:notion_learn-->'
-    );
-
-    const finalLines = [
-      ...readmeLines.slice(0, startIdx + 1),
-      ...newLines,
-      ...readmeLines.slice(endIdx)
-    ];
-
-    core.info(`Writing to ${README_PATH}`);
-
-    fs.writeFileSync(README_PATH, finalLines.join('\n'));
-
-    try {
-      await commitFile();
-    } catch (err) {
-      tools.log.debug('Something went wrong');
-      return core.setFailed(err.message);
+      try {
+        await commitFile();
+      } catch (err) {
+        return core.setFailed(err.message);
+      }
     }
   } catch (error) {
     return core.setFailed(error.message);
