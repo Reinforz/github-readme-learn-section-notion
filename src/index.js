@@ -137,12 +137,16 @@ async function main() {
         });
       });
 
-      rows.forEach((row) => {
-        const category = row.properties[category_schema_entry[0]][0][0];
-        if (!category) throw new Error('Each row must have a category value');
-        const category_value = categories_map.get(category);
-        category_value.items.push(row.properties);
-      });
+      rows
+        .sort((rowA, rowB) =>
+          rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1
+        )
+        .forEach((row) => {
+          const category = row.properties[category_schema_entry[0]][0][0];
+          if (!category) throw new Error('Each row must have a category value');
+          const category_value = categories_map.get(category);
+          category_value.items.push(row.properties);
+        });
 
       const newLines = [];
 
@@ -154,13 +158,13 @@ async function main() {
         ];
         category_info.items.forEach((item) =>
           content.push(
-            `<img src="https://img.shields.io/badge/-${qs.stringify(
+            `<img src="https://img.shields.io/badge/-${qs.escape(
               item.title[0][0]
             )}-${
               item[color_schema_entry[0]][0][0]
-            }?style=flat-square&amp;logo=${qs.stringify(
+            }?style=flat-square&amp;logo=${qs.escape(item.title[0][0])}" alt="${
               item.title[0][0]
-            )}" alt="${item.title[0][0]}"/>`
+            }"/>`
           )
         );
         newLines.push(...content, '<hr>');
