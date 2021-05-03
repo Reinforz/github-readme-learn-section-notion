@@ -16701,7 +16701,7 @@ async function main() {
         ]
       },
       {
-        token: secrets.NOTION_TOKEN_V2
+        token: process.secrets.NOTION_TOKEN_V2
       }
     );
 
@@ -16727,7 +16727,7 @@ async function main() {
         ]
       },
       {
-        token: secrets.NOTION_TOKEN_V2
+        token: process.secrets.NOTION_TOKEN_V2
       }
     );
 
@@ -16746,7 +16746,7 @@ async function main() {
         }
       },
       {
-        token: secrets.NOTION_TOKEN_V2
+        token: process.secrets.NOTION_TOKEN_V2
       }
     );
 

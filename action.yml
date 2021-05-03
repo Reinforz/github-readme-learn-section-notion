@@ -3,16 +3,9 @@ description: "Populates the learning section in your github readme with data fro
 author: devorein
 
 inputs:
-  database_type: # id of input
-    description: "What type of database are you using, a collection view page (full page database) or a collection view (inline database)"
-    required: false
-    default: "cvp"
   database_id:
     description: "The id of the database"
     required: true
-outputs:
-  success: # id of output
-    description: "Whether or not the operation was successful or not"
 
 branding:
   icon: "box"
