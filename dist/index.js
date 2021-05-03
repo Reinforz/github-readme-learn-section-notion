@@ -16783,10 +16783,10 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const README_PATH = __webpack_require__.ab + "README.md";
+    const README_PATH = path.resolve(__dirname, '../../README.md');
     core.info(`Reading from ${README_PATH}`);
 
-    const readmeLines = fs.readFileSync(__webpack_require__.ab + "README.md", 'utf-8').split('\n');
+    const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
     // Find the index corresponding to <!--START_SECTION:notion_learn--> comment
     let startIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
@@ -16816,7 +16816,7 @@ async function main() {
 
     core.info(`Writing to ${README_PATH}`);
 
-    fs.writeFileSync(__webpack_require__.ab + "README.md", finalLines.join('\n'));
+    fs.writeFileSync(README_PATH, finalLines.join('\n'));
 
     try {
       await commitFile();
