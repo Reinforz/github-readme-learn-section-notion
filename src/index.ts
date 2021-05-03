@@ -10,6 +10,19 @@ import {
 import fs from 'fs';
 import { commitFile } from './utils';
 
+const ColorMap: Record<TTextColor, string> = {
+  default: '505558',
+  gray: '979a9b',
+  brown: '695b55',
+  orange: '9f7445',
+  yellow: '9f9048',
+  green: '467870',
+  blue: '487088',
+  purple: '6c598f',
+  pink: '904d74',
+  red: '9f5c58'
+} as any;
+
 async function main() {
   try {
     const databaseId = core.getInput('database_id');
@@ -137,7 +150,9 @@ async function main() {
 
       for (const [category, category_info] of categories_map) {
         const content = [
-          `<div><img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/></div>`
+          `<div><img height="20px" src="https://img.shields.io/badge/${category}-${
+            ColorMap[category_info.color]
+          }"/></div>`
         ];
         category_info.items.forEach((item) =>
           content.push(

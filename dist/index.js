@@ -9847,6 +9847,18 @@ const core_1 = __importDefault(__webpack_require__(470));
 const endpoints_1 = __webpack_require__(897);
 const fs_1 = __importDefault(__webpack_require__(747));
 const utils_1 = __webpack_require__(326);
+const ColorMap = {
+    default: '505558',
+    gray: '979a9b',
+    brown: '695b55',
+    orange: '9f7445',
+    yellow: '9f9048',
+    green: '467870',
+    blue: '487088',
+    purple: '6c598f',
+    pink: '904d74',
+    red: '9f5c58'
+};
 async function main() {
     try {
         const databaseId = core_1.default.getInput('database_id');
@@ -9934,7 +9946,7 @@ async function main() {
             const newLines = [];
             for (const [category, category_info] of categories_map) {
                 const content = [
-                    `<div><img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/></div>`
+                    `<div><img height="20px" src="https://img.shields.io/badge/${category}-${ColorMap[category_info.color]}"/></div>`
                 ];
                 category_info.items.forEach((item) => content.push(`<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`));
                 newLines.push(...content, '<hr>');
