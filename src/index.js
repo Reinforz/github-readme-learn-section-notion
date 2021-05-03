@@ -17,11 +17,11 @@ async function main() {
         ]
       },
       {
-        token: process.env.NOTION_TOKEN_V2
+        token: secrets.NOTION_TOKEN_V2
       }
     );
 
-    core.info('Successfully fetched database');
+    core.info('Fetched database');
 
     // If a database with the passed id doesn't exist
     if (!collectionViewData.recordMap.block[databaseId].value) {
@@ -43,11 +43,11 @@ async function main() {
         ]
       },
       {
-        token: process.env.NOTION_TOKEN_V2
+        token: secrets.NOTION_TOKEN_V2
       }
     );
 
-    core.info('Successfully fetched collection');
+    core.info('Fetched collection');
 
     const { recordMap } = await NotionEndpoints.Queries.queryCollection(
       {
@@ -62,11 +62,11 @@ async function main() {
         }
       },
       {
-        token: process.env.NOTION_TOKEN_V2
+        token: secrets.NOTION_TOKEN_V2
       }
     );
 
-    core.info('Successfully fetched rows');
+    core.info('Fetched rows');
 
     const collection = collectionData.recordMap.collection[collection_id].value;
     const { schema } = collection;
