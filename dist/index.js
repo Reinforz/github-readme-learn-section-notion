@@ -21268,13 +21268,13 @@ async function main() {
         ];
         category_info.items.forEach((item) =>
           content.push(
-            `<img src="https://img.shields.io/badge/-${qs.escape(
+            `<span><img src="https://img.shields.io/badge/-${qs.escape(
               item.title[0][0]
             )}-${
               item[color_schema_entry[0]][0][0]
             }?style=flat-square&amp;logo=${qs.escape(item.title[0][0])}" alt="${
               item.title[0][0]
-            }"/>`
+            }"/></span>`
           )
         );
         newLines.push(...content, '<hr>');
