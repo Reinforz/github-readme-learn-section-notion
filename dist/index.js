@@ -21222,6 +21222,14 @@ const getSchemaEntries = (schema) => {
     return [category_schema_entry, color_schema_entry];
 };
 
+;// CONCATENATED MODULE: ./src/utils/modifyRows.ts
+const modifyRows = (recordMap, databaseId) => {
+    return Object.values(recordMap.block)
+        .filter((block) => block.value.id !== databaseId)
+        .map((block) => block.value)
+        .sort((rowA, rowB) => rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1);
+};
+
 ;// CONCATENATED MODULE: ./src/index.ts
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21232,6 +21240,7 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -21296,10 +21305,7 @@ function main() {
                 .value;
             const { schema } = collection;
             const [category_schema_entry, color_schema_entry] = getSchemaEntries(schema);
-            const rows = Object.values(recordMap.block)
-                .filter((block) => block.value.id !== databaseId)
-                .map((block) => block.value)
-                .sort((rowA, rowB) => rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1);
+            const rows = modifyRows(recordMap, databaseId);
             if (rows.length === 0)
                 return core.error('No database rows detected');
             else {
@@ -21322,6 +21328,7 @@ function main() {
                     ...readmeLines.slice(endIdx)
                 ];
                 core.info(`Writing to ${README_PATH}`);
+                console.log(finalLines);
                 external_fs_default().writeFileSync(README_PATH, finalLines.join('\n'));
                 try {
                     yield commitFile();

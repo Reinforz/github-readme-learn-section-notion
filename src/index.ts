@@ -1,12 +1,13 @@
 import * as core from '@actions/core';
 import { NotionEndpoints } from '@nishans/endpoints';
-import { ICollection, ICollectionBlock, IPage } from '@nishans/types';
+import { ICollection, ICollectionBlock } from '@nishans/types';
 import fs from 'fs';
 import { checkForSections } from './utils/checkForSections';
 import { commitFile } from './utils/commitFile';
 import { constructCategoriesMap } from './utils/constructCategoriesMap';
 import { constructNewContents } from './utils/constructNewContents';
 import { getSchemaEntries } from './utils/getSchemaEntries';
+import { modifyRows } from './utils/modifyRows';
 
 async function main() {
   try {
@@ -87,12 +88,7 @@ async function main() {
       schema
     );
 
-    const rows = Object.values(recordMap.block)
-      .filter((block) => block.value.id !== databaseId)
-      .map((block) => block.value as IPage)
-      .sort((rowA, rowB) =>
-        rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1
-      );
+    const rows = modifyRows(recordMap, databaseId);
 
     if (rows.length === 0) return core.error('No database rows detected');
     else {
@@ -122,6 +118,8 @@ async function main() {
       ];
 
       core.info(`Writing to ${README_PATH}`);
+
+      console.log(finalLines);
 
       fs.writeFileSync(README_PATH, finalLines.join('\n'));
 
