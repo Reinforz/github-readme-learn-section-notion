@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 
 const commitFile = async () => {
   await exec('git', [
@@ -13,7 +13,7 @@ const commitFile = async () => {
   await exec('git', ['push']);
 };
 
-const exec = (cmd, args = []) =>
+const exec = (cmd: string, args: string[] = []) =>
   new Promise((resolve, reject) => {
     const app = spawn(cmd, args, { stdio: 'pipe' });
     let stdout = '';
@@ -22,7 +22,7 @@ const exec = (cmd, args = []) =>
     });
     app.on('close', (code) => {
       if (code !== 0 && !stdout.includes('nothing to commit')) {
-        err = new Error(`Invalid status code: ${code}`);
+        const err = new Error(`Invalid status code: ${code}`) as any;
         err.code = code;
         return reject(err);
       }
@@ -31,6 +31,4 @@ const exec = (cmd, args = []) =>
     app.on('error', reject);
   });
 
-module.exports = {
-  commitFile
-};
+export { commitFile };

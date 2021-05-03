@@ -1,8 +1,14 @@
-const core = require('@actions/core');
-const { NotionEndpoints } = require('@nishans/endpoints');
-const fs = require('fs');
-const { commitFile } = require('./utils');
-const path = require('path');
+import core from '@actions/core';
+import { NotionEndpoints } from '@nishans/endpoints';
+import {
+  ICollection,
+  ICollectionViewPage,
+  IPage,
+  MultiSelectSchemaUnit,
+  TTextColor
+} from '@nishans/types';
+import fs from 'fs';
+import { commitFile } from './utils';
 
 async function main() {
   try {
@@ -20,21 +26,24 @@ async function main() {
         ]
       },
       {
-        token: NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2,
+        user_id: ''
       }
     );
 
     core.info('Fetched database');
 
+    const collectionView = collectionViewData.recordMap.block[databaseId]
+      .value as ICollectionViewPage;
+
     // If a database with the passed id doesn't exist
-    if (!collectionViewData.recordMap.block[databaseId].value) {
+    if (!collectionView) {
       return core.setFailed(
         `Either your NOTION_TOKEN_V2 has expired or a database with id:${databaseId} doesn't exist`
       );
     }
 
-    const collection_id =
-      collectionViewData.recordMap.block[databaseId].value.collection_id;
+    const collection_id = collectionView.collection_id;
     const collectionData = await NotionEndpoints.Queries.syncRecordValues(
       {
         requests: [
@@ -46,7 +55,8 @@ async function main() {
         ]
       },
       {
-        token: NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2,
+        user_id: ''
       }
     );
 
@@ -65,13 +75,15 @@ async function main() {
         }
       },
       {
-        token: NOTION_TOKEN_V2
+        token: NOTION_TOKEN_V2,
+        user_id: ''
       }
     );
 
     core.info('Fetched rows');
 
-    const collection = collectionData.recordMap.collection[collection_id].value;
+    const collection = collectionData.recordMap.collection[collection_id]
+      .value as ICollection;
     const { schema } = collection;
 
     // Validate collection schema
@@ -80,18 +92,18 @@ async function main() {
         ([, schema_entry_value]) =>
           schema_entry_value.type === 'multi_select' &&
           schema_entry_value.name === 'Category'
-      );
+      ) as [string, MultiSelectSchemaUnit];
 
     if (!category_schema_entry)
       return core.setFailed(
         "Couldn't find Category named multi_select type column in the database"
       );
 
-    const rows = Object.values(recordMap.block)
+    const rows = (Object.values(recordMap.block) as { value: IPage }[])
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    if (rows.length === 0) return core.warn('No database rows detected');
+    if (rows.length === 0) return core.error('No database rows detected');
     else {
       const categories = category_schema_entry[1].options
         .map((option) => ({
@@ -102,7 +114,10 @@ async function main() {
           categoryA.value > categoryB.value ? 1 : -1
         );
 
-      const categories_map = new Map();
+      const categories_map: Map<
+        string,
+        { items: string[]; color: TTextColor; value: string }
+      > = new Map();
 
       categories.forEach((category) => {
         categories_map.set(category.value, {
@@ -114,7 +129,7 @@ async function main() {
       rows.forEach((row) => {
         const category = row.properties[category_schema_entry[0]][0][0];
         if (!category) throw new Error('Each row must have a category value');
-        const category_value = categories_map.get(category);
+        const category_value = categories_map.get(category)!;
         category_value.items.push(row.properties.title[0][0]);
       });
 
@@ -146,15 +161,15 @@ async function main() {
         );
       }
 
+      const endIdx = readmeLines.findIndex(
+        (content) => content.trim() === '<!--END_SECTION:learn-->'
+      );
+
       if (endIdx === -1) {
         return core.setFailed(
           `Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`
         );
       }
-
-      const endIdx = readmeLines.findIndex(
-        (content) => content.trim() === '<!--END_SECTION:learn-->'
-      );
 
       const finalLines = [
         ...readmeLines.slice(0, startIdx + 1),
