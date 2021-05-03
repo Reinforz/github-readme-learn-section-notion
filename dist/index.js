@@ -16760,20 +16760,12 @@ async function main() {
 
     // Validate collection schema
     const schema_entries = Object.entries(schema),
-      icon_schema_entry = schema_entries.find(
-        ([, schema_entry_value]) =>
-          schema_entry_value.type === 'url' &&
-          schema_entry_value.name === 'Icon'
-      ),
       category_schema_entry = schema_entries.find(
         ([, schema_entry_value]) =>
           schema_entry_value.type === 'multi_select' &&
           schema_entry_value.name === 'Category'
       );
-    if (!icon_schema_entry)
-      return core.setFailed(
-        "Couldn't find Icon named url type column in the database"
-      );
+
     if (!category_schema_entry)
       return core.setFailed(
         "Couldn't find Category named multi_select type column in the database"
@@ -16783,30 +16775,62 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
+    const categories = category_schema_entry[1].options
+      .map((option) => ({
+        color: option.color,
+        value: option.value
+      }))
+      .sort((categoryA, categoryB) =>
+        categoryA.value > categoryB.value ? 1 : -1
+      );
+
+    const categories_map = new Map();
+
+    categories.forEach((category) => {
+      categories_map.set(category.value, {
+        items: [],
+        ...category
+      });
+    });
+
+    rows.forEach((row) => {
+      const category = row.properties[category_schema_entry[0]][0][0];
+      if (!category) throw new Error('Each row must have a category value');
+      const category_value = categories_map.get(category);
+      category_value.items.push(row.properties.title[0][0]);
+    });
+
+    const newLines = [];
+
+    for (const [category, category_info] of categories_map) {
+      const content = [
+        `<img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/>`,
+        '</br>'
+      ];
+      category_info.items.forEach((item) =>
+        content.push(
+          `<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`
+        )
+      );
+      newLines.push(...content, '</br>');
+    }
+
     const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
     core.info(`Reading from ${README_PATH}`);
 
     const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
-    console.log(readmeLines);
-    // Find the index corresponding to <!--START_SECTION:notion_learn--> comment
     let startIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
     );
 
-    // Early return in case the <!--START_SECTION:notion_learn--> comment was not found
     if (startIdx === -1) {
       return core.setFailed(
         `Couldn't find the <!--START_SECTION:notion_learn--> comment. Exiting!`
       );
     }
 
-    // Find the index corresponding to <!--END_SECTION:notion_learn--> comment
     const endIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--END_SECTION:notion_learn-->'
-    );
-
-    const newLines = rows.map(
-      (row, idx) => `${idx + 1}. ${row.properties.title[0][0]}`
     );
 
     const finalLines = [
