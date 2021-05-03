@@ -141,7 +141,7 @@ async function main() {
         const category = row.properties[category_schema_entry[0]][0][0];
         if (!category) throw new Error('Each row must have a category value');
         const category_value = categories_map.get(category);
-        category_value.items.push(row.properties.title[0][0]);
+        category_value.items.push(row.properties);
       });
 
       const newLines = [];
@@ -154,9 +154,13 @@ async function main() {
         ];
         category_info.items.forEach((item) =>
           content.push(
-            `<img src="https://img.shields.io/badge/-${qs.stringify(item)}-${
-              item.properties[color_schema_entry[0]][0][0]
-            }?style=flat-square&amp;logo=${qs.stringify(item)}" alt="${item}"/>`
+            `<img src="https://img.shields.io/badge/-${qs.stringify(
+              item.title[0][0]
+            )}-${
+              item[color_schema_entry[0]][0][0]
+            }?style=flat-square&amp;logo=${qs.stringify(
+              item.title[0][0]
+            )}" alt="${item.title[0][0]}"/>`
           )
         );
         newLines.push(...content, '<hr>');
