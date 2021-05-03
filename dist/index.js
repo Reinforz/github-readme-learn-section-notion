@@ -16686,6 +16686,7 @@ const core = __webpack_require__(470);
 const { NotionEndpoints } = __webpack_require__(897);
 const fs = __webpack_require__(747);
 const { commitFile } = __webpack_require__(543);
+const path = __webpack_require__(622);
 
 async function main() {
   try {
@@ -16782,9 +16783,11 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const readmeContent = fs.readFileSync('./README.md', 'utf-8').split('\n');
+    const readmeLines = fs
+      .readFileSync(__webpack_require__.ab + "README.md", 'utf-8')
+      .split('\n');
     // Find the index corresponding to <!--START_SECTION:notion_learn--> comment
-    let startIdx = readmeContent.findIndex(
+    let startIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
     );
 
@@ -16796,7 +16799,7 @@ async function main() {
     }
 
     // Find the index corresponding to <!--END_SECTION:notion_learn--> comment
-    const endIdx = readmeContent.findIndex(
+    const endIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--END_SECTION:notion_learn-->'
     );
 
@@ -16805,12 +16808,15 @@ async function main() {
     );
 
     const finalLines = [
-      ...readmeContent.slice(0, startIdx + 1),
+      ...readmeLines.slice(0, startIdx + 1),
       ...newLines,
-      ...readmeContent.slice(endIdx)
+      ...readmeLines.slice(endIdx)
     ];
 
-    fs.writeFileSync('./README.md', finalLines.join('\n'));
+    fs.writeFileSync(
+      __webpack_require__.ab + "README.md",
+      finalLines.join('\n')
+    );
 
     try {
       await commitFile();

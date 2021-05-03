@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const { NotionEndpoints } = require('@nishans/endpoints');
 const fs = require('fs');
 const { commitFile } = require('./utils');
+const path = require('path');
 
 async function main() {
   try {
@@ -98,9 +99,11 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const readmeContent = fs.readFileSync('./README.md', 'utf-8').split('\n');
+    const readmeLines = fs
+      .readFileSync(path.resolve(__dirname, '../README.md'), 'utf-8')
+      .split('\n');
     // Find the index corresponding to <!--START_SECTION:notion_learn--> comment
-    let startIdx = readmeContent.findIndex(
+    let startIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
     );
 
@@ -112,7 +115,7 @@ async function main() {
     }
 
     // Find the index corresponding to <!--END_SECTION:notion_learn--> comment
-    const endIdx = readmeContent.findIndex(
+    const endIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--END_SECTION:notion_learn-->'
     );
 
@@ -121,12 +124,15 @@ async function main() {
     );
 
     const finalLines = [
-      ...readmeContent.slice(0, startIdx + 1),
+      ...readmeLines.slice(0, startIdx + 1),
       ...newLines,
-      ...readmeContent.slice(endIdx)
+      ...readmeLines.slice(endIdx)
     ];
 
-    fs.writeFileSync('./README.md', finalLines.join('\n'));
+    fs.writeFileSync(
+      path.resolve(__dirname, '../README.md'),
+      finalLines.join('\n')
+    );
 
     try {
       await commitFile();
