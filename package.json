@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npx ncc build ./src/index.js -o dist",
     "prepare": "husky install",
-    "format": "npx prettier --write src/*.js"
+    "format": "npx prettier --write src/*.js",
+    "add": "npm run format && npm run build && git add ."
   },
   "repository": {
     "type": "git",
