@@ -99,9 +99,10 @@ async function main() {
       .filter((block) => block.value.id !== databaseId)
       .map((block) => block.value);
 
-    const readmeLines = fs
-      .readFileSync(path.resolve(__dirname, '../README.md'), 'utf-8')
-      .split('\n');
+    const README_PATH = path.resolve(__dirname, '../README.md');
+    core.info(`Reading from ${README_PATH}`);
+
+    const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
     // Find the index corresponding to <!--START_SECTION:notion_learn--> comment
     let startIdx = readmeLines.findIndex(
       (content) => content.trim() === '<!--START_SECTION:notion_learn-->'
@@ -109,7 +110,7 @@ async function main() {
 
     // Early return in case the <!--START_SECTION:notion_learn--> comment was not found
     if (startIdx === -1) {
-      return console.error(
+      return core.setFailed(
         `Couldn't find the <!--START_SECTION:notion_learn--> comment. Exiting!`
       );
     }
@@ -129,10 +130,9 @@ async function main() {
       ...readmeLines.slice(endIdx)
     ];
 
-    fs.writeFileSync(
-      path.resolve(__dirname, '../README.md'),
-      finalLines.join('\n')
-    );
+    core.info(`Writing to ${README_PATH}`);
+
+    fs.writeFileSync(README_PATH, finalLines.join('\n'));
 
     try {
       await commitFile();
