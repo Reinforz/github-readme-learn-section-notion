@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 
 export const checkForSections = (readmeLines: string[]) => {
-  let startIdx = readmeLines.findIndex(
+  const startIdx = readmeLines.findIndex(
     (content) => content.trim() === '<!--START_SECTION:learn-->'
   );
 

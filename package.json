@@ -7,7 +7,8 @@
     "prebuild": "npm run format && npm run transpile",
     "build": "npx ncc build ./src/index.ts -o dist -t",
     "format": "npx prettier --write src/*.ts",
-    "transpile": "npx tsc"
+    "transpile": "npx tsc",
+    "test": "npx jest"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,10 @@
   },
   "devDependencies": {
     "@nishans/types": "^0.0.35",
+    "@types/jest": "^26.0.23",
     "@types/node": "^15.0.1",
-    "prettier": "^2.2.1"
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.5"
   }
 }

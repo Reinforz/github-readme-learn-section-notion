@@ -119,9 +119,7 @@ async function main() {
 
       core.info(`Writing to ${README_PATH}`);
 
-      console.log(finalLines);
-
-      fs.writeFileSync(README_PATH, finalLines.join('\n'));
+      fs.writeFileSync(README_PATH, finalLines.join('\n'), 'utf-8');
 
       try {
         await commitFile();
