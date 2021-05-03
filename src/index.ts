@@ -33,7 +33,7 @@ async function main() {
 
     core.info('Fetched database');
 
-    const collectionView = collectionViewData.recordMap.block[databaseId]
+    const collectionView = collectionViewData.recordMap.block![databaseId]
       .value as ICollectionViewPage;
 
     // If a database with the passed id doesn't exist
@@ -82,7 +82,7 @@ async function main() {
 
     core.info('Fetched rows');
 
-    const collection = collectionData.recordMap.collection[collection_id]
+    const collection = collectionData.recordMap.collection![collection_id]!
       .value as ICollection;
     const { schema } = collection;
 

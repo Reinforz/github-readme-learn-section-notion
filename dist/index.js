@@ -40,7 +40,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(676);
+/******/ 		return __webpack_require__(362);
 /******/ 	};
 /******/
 /******/ 	// run startup
@@ -8937,7 +8937,46 @@ module.exports = isStream;
 /***/ }),
 /* 324 */,
 /* 325 */,
-/* 326 */,
+/* 326 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.commitFile = void 0;
+const child_process_1 = __webpack_require__(129);
+const commitFile = async () => {
+    await exec('git', [
+        'config',
+        '--global',
+        'user.email',
+        '41898282+github-actions[bot]@users.noreply.github.com'
+    ]);
+    await exec('git', ['config', '--global', 'user.name', 'readme-bot']);
+    await exec('git', ['add', 'README.md']);
+    await exec('git', ['commit', '-m', 'Updated readme with learn section']);
+    await exec('git', ['push']);
+};
+exports.commitFile = commitFile;
+const exec = (cmd, args = []) => new Promise((resolve, reject) => {
+    const app = child_process_1.spawn(cmd, args, { stdio: 'pipe' });
+    let stdout = '';
+    app.stdout.on('data', (data) => {
+        stdout = data;
+    });
+    app.on('close', (code) => {
+        if (code !== 0 && !stdout.includes('nothing to commit')) {
+            const err = new Error(`Invalid status code: ${code}`);
+            err.code = code;
+            return reject(err);
+        }
+        return resolve(code);
+    });
+    app.on('error', reject);
+});
+//# sourceMappingURL=utils.js.map
+
+/***/ }),
 /* 327 */
 /***/ (function(__unusedmodule, exports) {
 
@@ -9795,7 +9834,145 @@ module.exports = require("assert");
 module.exports = {"name":"axios","version":"0.21.1","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test && bundlesize","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://github.com/axios/axios","devDependencies":{"bundlesize":"^0.17.0","coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.0.2","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^20.1.0","grunt-karma":"^2.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.2.0","karma-coverage":"^1.1.1","karma-firefox-launcher":"^1.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.2.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^5.2.0","sinon":"^4.5.0","typescript":"^2.8.1","url-search-params":"^0.10.0","webpack":"^1.13.1","webpack-dev-server":"^1.14.1"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.10.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]};
 
 /***/ }),
-/* 362 */,
+/* 362 */
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = __importDefault(__webpack_require__(470));
+const endpoints_1 = __webpack_require__(897);
+const fs_1 = __importDefault(__webpack_require__(747));
+const utils_1 = __webpack_require__(326);
+async function main() {
+    try {
+        const databaseId = core_1.default.getInput('database_id');
+        const NOTION_TOKEN_V2 = core_1.default.getInput('token_v2');
+        const collectionViewData = await endpoints_1.NotionEndpoints.Queries.syncRecordValues({
+            requests: [
+                {
+                    id: databaseId,
+                    table: 'block',
+                    version: -1
+                }
+            ]
+        }, {
+            token: NOTION_TOKEN_V2,
+            user_id: ''
+        });
+        core_1.default.info('Fetched database');
+        const collectionView = collectionViewData.recordMap.block[databaseId]
+            .value;
+        if (!collectionView) {
+            return core_1.default.setFailed(`Either your NOTION_TOKEN_V2 has expired or a database with id:${databaseId} doesn't exist`);
+        }
+        const collection_id = collectionView.collection_id;
+        const collectionData = await endpoints_1.NotionEndpoints.Queries.syncRecordValues({
+            requests: [
+                {
+                    id: collection_id,
+                    table: 'collection',
+                    version: -1
+                }
+            ]
+        }, {
+            token: NOTION_TOKEN_V2,
+            user_id: ''
+        });
+        core_1.default.info('Fetched collection');
+        const { recordMap } = await endpoints_1.NotionEndpoints.Queries.queryCollection({
+            collectionId: collection_id,
+            collectionViewId: '',
+            query: {},
+            loader: {
+                type: 'table',
+                loadContentCover: false,
+                limit: 10000,
+                userTimeZone: ''
+            }
+        }, {
+            token: NOTION_TOKEN_V2,
+            user_id: ''
+        });
+        core_1.default.info('Fetched rows');
+        const collection = collectionData.recordMap.collection[collection_id]
+            .value;
+        const { schema } = collection;
+        const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'multi_select' &&
+            schema_entry_value.name === 'Category');
+        if (!category_schema_entry)
+            return core_1.default.setFailed("Couldn't find Category named multi_select type column in the database");
+        const rows = Object.values(recordMap.block)
+            .filter((block) => block.value.id !== databaseId)
+            .map((block) => block.value);
+        if (rows.length === 0)
+            return core_1.default.error('No database rows detected');
+        else {
+            const categories = category_schema_entry[1].options
+                .map((option) => ({
+                color: option.color,
+                value: option.value
+            }))
+                .sort((categoryA, categoryB) => categoryA.value > categoryB.value ? 1 : -1);
+            const categories_map = new Map();
+            categories.forEach((category) => {
+                categories_map.set(category.value, {
+                    items: [],
+                    ...category
+                });
+            });
+            rows.forEach((row) => {
+                const category = row.properties[category_schema_entry[0]][0][0];
+                if (!category)
+                    throw new Error('Each row must have a category value');
+                const category_value = categories_map.get(category);
+                category_value.items.push(row.properties.title[0][0]);
+            });
+            const newLines = [];
+            for (const [category, category_info] of categories_map) {
+                const content = [
+                    `<div><img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/></div>`
+                ];
+                category_info.items.forEach((item) => content.push(`<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`));
+                newLines.push(...content, '<hr>');
+            }
+            const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
+            core_1.default.info(`Reading from ${README_PATH}`);
+            const readmeLines = fs_1.default.readFileSync(README_PATH, 'utf-8').split('\n');
+            let startIdx = readmeLines.findIndex((content) => content.trim() === '<!--START_SECTION:learn-->');
+            if (startIdx === -1) {
+                return core_1.default.setFailed(`Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`);
+            }
+            const endIdx = readmeLines.findIndex((content) => content.trim() === '<!--END_SECTION:learn-->');
+            if (endIdx === -1) {
+                return core_1.default.setFailed(`Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`);
+            }
+            const finalLines = [
+                ...readmeLines.slice(0, startIdx + 1),
+                ...newLines,
+                ...readmeLines.slice(endIdx)
+            ];
+            core_1.default.info(`Writing to ${README_PATH}`);
+            fs_1.default.writeFileSync(README_PATH, finalLines.join('\n'));
+            try {
+                await utils_1.commitFile();
+            }
+            catch (err) {
+                return core_1.default.setFailed(err.message);
+            }
+        }
+    }
+    catch (error) {
+        return core_1.default.setFailed(error.message);
+    }
+}
+main();
+//# sourceMappingURL=index.js.map
+
+/***/ }),
 /* 363 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -13156,48 +13333,7 @@ module.exports = function enabled(name, variable) {
 
 /***/ }),
 /* 542 */,
-/* 543 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-const { spawn } = __webpack_require__(129);
-
-const commitFile = async () => {
-  await exec('git', [
-    'config',
-    '--global',
-    'user.email',
-    '41898282+github-actions[bot]@users.noreply.github.com'
-  ]);
-  await exec('git', ['config', '--global', 'user.name', 'readme-bot']);
-  await exec('git', ['add', 'README.md']);
-  await exec('git', ['commit', '-m', 'Updated readme with learn section']);
-  await exec('git', ['push']);
-};
-
-const exec = (cmd, args = []) =>
-  new Promise((resolve, reject) => {
-    const app = spawn(cmd, args, { stdio: 'pipe' });
-    let stdout = '';
-    app.stdout.on('data', (data) => {
-      stdout = data;
-    });
-    app.on('close', (code) => {
-      if (code !== 0 && !stdout.includes('nothing to commit')) {
-        err = new Error(`Invalid status code: ${code}`);
-        err.code = code;
-        return reject(err);
-      }
-      return resolve(code);
-    });
-    app.on('error', reject);
-  });
-
-module.exports = {
-  commitFile
-};
-
-
-/***/ }),
+/* 543 */,
 /* 544 */,
 /* 545 */
 /***/ (function(module) {
@@ -16679,192 +16815,7 @@ function simpleEnd(buf) {
 
 /***/ }),
 /* 675 */,
-/* 676 */
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
-
-const core = __webpack_require__(470);
-const { NotionEndpoints } = __webpack_require__(897);
-const fs = __webpack_require__(747);
-const { commitFile } = __webpack_require__(543);
-const path = __webpack_require__(622);
-
-async function main() {
-  try {
-    const databaseId = core.getInput('database_id');
-    const NOTION_TOKEN_V2 = core.getInput('token_v2');
-
-    const collectionViewData = await NotionEndpoints.Queries.syncRecordValues(
-      {
-        requests: [
-          {
-            id: databaseId,
-            table: 'block',
-            version: -1
-          }
-        ]
-      },
-      {
-        token: NOTION_TOKEN_V2
-      }
-    );
-
-    core.info('Fetched database');
-
-    // If a database with the passed id doesn't exist
-    if (!collectionViewData.recordMap.block[databaseId].value) {
-      return core.setFailed(
-        `Either your NOTION_TOKEN_V2 has expired or a database with id:${databaseId} doesn't exist`
-      );
-    }
-
-    const collection_id =
-      collectionViewData.recordMap.block[databaseId].value.collection_id;
-    const collectionData = await NotionEndpoints.Queries.syncRecordValues(
-      {
-        requests: [
-          {
-            id: collection_id,
-            table: 'collection',
-            version: -1
-          }
-        ]
-      },
-      {
-        token: NOTION_TOKEN_V2
-      }
-    );
-
-    core.info('Fetched collection');
-
-    const { recordMap } = await NotionEndpoints.Queries.queryCollection(
-      {
-        collectionId: collection_id,
-        collectionViewId: '',
-        query: {},
-        loader: {
-          type: 'table',
-          loadContentCover: false,
-          limit: 10000,
-          userTimeZone: ''
-        }
-      },
-      {
-        token: NOTION_TOKEN_V2
-      }
-    );
-
-    core.info('Fetched rows');
-
-    const collection = collectionData.recordMap.collection[collection_id].value;
-    const { schema } = collection;
-
-    // Validate collection schema
-    const schema_entries = Object.entries(schema),
-      category_schema_entry = schema_entries.find(
-        ([, schema_entry_value]) =>
-          schema_entry_value.type === 'multi_select' &&
-          schema_entry_value.name === 'Category'
-      );
-
-    if (!category_schema_entry)
-      return core.setFailed(
-        "Couldn't find Category named multi_select type column in the database"
-      );
-
-    const rows = Object.values(recordMap.block)
-      .filter((block) => block.value.id !== databaseId)
-      .map((block) => block.value);
-
-    if (rows.length === 0) return core.warn('No database rows detected');
-    else {
-      const categories = category_schema_entry[1].options
-        .map((option) => ({
-          color: option.color,
-          value: option.value
-        }))
-        .sort((categoryA, categoryB) =>
-          categoryA.value > categoryB.value ? 1 : -1
-        );
-
-      const categories_map = new Map();
-
-      categories.forEach((category) => {
-        categories_map.set(category.value, {
-          items: [],
-          ...category
-        });
-      });
-
-      rows.forEach((row) => {
-        const category = row.properties[category_schema_entry[0]][0][0];
-        if (!category) throw new Error('Each row must have a category value');
-        const category_value = categories_map.get(category);
-        category_value.items.push(row.properties.title[0][0]);
-      });
-
-      const newLines = [];
-
-      for (const [category, category_info] of categories_map) {
-        const content = [
-          `<div><img height="20px" src="https://img.shields.io/badge/${category}-${category_info.color}"/></div>`
-        ];
-        category_info.items.forEach((item) =>
-          content.push(
-            `<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`
-          )
-        );
-        newLines.push(...content, '<hr>');
-      }
-
-      const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
-      core.info(`Reading from ${README_PATH}`);
-
-      const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
-      let startIdx = readmeLines.findIndex(
-        (content) => content.trim() === '<!--START_SECTION:learn-->'
-      );
-
-      if (startIdx === -1) {
-        return core.setFailed(
-          `Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`
-        );
-      }
-
-      if (endIdx === -1) {
-        return core.setFailed(
-          `Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`
-        );
-      }
-
-      const endIdx = readmeLines.findIndex(
-        (content) => content.trim() === '<!--END_SECTION:learn-->'
-      );
-
-      const finalLines = [
-        ...readmeLines.slice(0, startIdx + 1),
-        ...newLines,
-        ...readmeLines.slice(endIdx)
-      ];
-
-      core.info(`Writing to ${README_PATH}`);
-
-      fs.writeFileSync(README_PATH, finalLines.join('\n'));
-
-      try {
-        await commitFile();
-      } catch (err) {
-        return core.setFailed(err.message);
-      }
-    }
-  } catch (error) {
-    return core.setFailed(error.message);
-  }
-}
-
-main();
-
-
-/***/ }),
+/* 676 */,
 /* 677 */,
 /* 678 */,
 /* 679 */

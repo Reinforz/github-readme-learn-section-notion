@@ -4,9 +4,10 @@
   "description": "A github action to populate readme learn section with data fetched from a remote notion database",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npx ncc build ./src/index.js -o dist",
-    "format": "npx prettier --write src/*.js",
-    "transpile": "npx tsc -w"
+    "prebuild": "npm run format && npm run transpile",
+    "build": "npx ncc build ./build/index.js -o dist",
+    "format": "npx prettier --write src/*.ts",
+    "transpile": "npx tsc"
   },
   "repository": {
     "type": "git",
