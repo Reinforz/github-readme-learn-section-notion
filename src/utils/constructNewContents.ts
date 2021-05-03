@@ -24,16 +24,16 @@ export const constructNewContents = (
 
   for (const [category, category_info] of categories_map) {
     const content = [
-      `<h3><img height="20px" src="https://img.shields.io/badge/${category}-${
-        ColorMap[category_info.color]
-      }"/></h3>`
+      `<h3><img height="20px" src="https://img.shields.io/badge/${qs.escape(
+        category
+      )}-${ColorMap[category_info.color]}"/></h3>`
     ];
     category_info.items.forEach((item) =>
       content.push(
         `<span><img src="https://img.shields.io/badge/-${qs.escape(
           item.title[0][0]
         )}-${
-          item[color_schema_unit_key][0][0]
+          item[color_schema_unit_key]?.[0][0] ?? 'black'
         }?style=flat-square&amp;logo=${qs.escape(item.title[0][0])}" alt="${
           item.title[0][0]
         }"/></span>`
