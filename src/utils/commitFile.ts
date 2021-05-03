@@ -1,18 +1,5 @@
 import { spawn } from 'child_process';
 
-const commitFile = async () => {
-  await exec('git', [
-    'config',
-    '--global',
-    'user.email',
-    '41898282+github-actions[bot]@users.noreply.github.com'
-  ]);
-  await exec('git', ['config', '--global', 'user.name', 'readme-bot']);
-  await exec('git', ['add', 'README.md']);
-  await exec('git', ['commit', '-m', 'Updated readme with learn section']);
-  await exec('git', ['push']);
-};
-
 const exec = (cmd: string, args: string[] = []) =>
   new Promise((resolve, reject) => {
     const app = spawn(cmd, args, { stdio: 'pipe' });
@@ -31,4 +18,15 @@ const exec = (cmd: string, args: string[] = []) =>
     app.on('error', reject);
   });
 
-export { commitFile };
+export const commitFile = async () => {
+  await exec('git', [
+    'config',
+    '--global',
+    'user.email',
+    '41898282+github-actions[bot]@users.noreply.github.com'
+  ]);
+  await exec('git', ['config', '--global', 'user.name', 'readme-bot']);
+  await exec('git', ['add', 'README.md']);
+  await exec('git', ['commit', '-m', 'Updated readme with learn section']);
+  await exec('git', ['push']);
+};

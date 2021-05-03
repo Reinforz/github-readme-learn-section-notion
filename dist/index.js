@@ -21108,12 +21108,23 @@ var libs = __nccwpck_require__(1109);
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(5747);
 var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
-;// CONCATENATED MODULE: external "querystring"
-const external_querystring_namespaceObject = require("querystring");;
-var external_querystring_default = /*#__PURE__*/__nccwpck_require__.n(external_querystring_namespaceObject);
+;// CONCATENATED MODULE: ./src/utils/checkForSections.ts
+
+const checkForSections = (readmeLines) => {
+    let startIdx = readmeLines.findIndex((content) => content.trim() === '<!--START_SECTION:learn-->');
+    if (startIdx === -1) {
+        core.setFailed(`Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`);
+    }
+    const endIdx = readmeLines.findIndex((content) => content.trim() === '<!--END_SECTION:learn-->');
+    if (endIdx === -1) {
+        core.setFailed(`Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`);
+    }
+    return [startIdx, endIdx];
+};
+
 ;// CONCATENATED MODULE: external "child_process"
 const external_child_process_namespaceObject = require("child_process");;
-;// CONCATENATED MODULE: ./src/utils.ts
+;// CONCATENATED MODULE: ./src/utils/commitFile.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -21124,18 +21135,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
-const commitFile = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield exec('git', [
-        'config',
-        '--global',
-        'user.email',
-        '41898282+github-actions[bot]@users.noreply.github.com'
-    ]);
-    yield exec('git', ['config', '--global', 'user.name', 'readme-bot']);
-    yield exec('git', ['add', 'README.md']);
-    yield exec('git', ['commit', '-m', 'Updated readme with learn section']);
-    yield exec('git', ['push']);
-});
 const exec = (cmd, args = []) => new Promise((resolve, reject) => {
     const app = (0,external_child_process_namespaceObject.spawn)(cmd, args, { stdio: 'pipe' });
     let stdout = '';
@@ -21152,7 +21151,76 @@ const exec = (cmd, args = []) => new Promise((resolve, reject) => {
     });
     app.on('error', reject);
 });
+const commitFile = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield exec('git', [
+        'config',
+        '--global',
+        'user.email',
+        '41898282+github-actions[bot]@users.noreply.github.com'
+    ]);
+    yield exec('git', ['config', '--global', 'user.name', 'readme-bot']);
+    yield exec('git', ['add', 'README.md']);
+    yield exec('git', ['commit', '-m', 'Updated readme with learn section']);
+    yield exec('git', ['push']);
+});
 
+;// CONCATENATED MODULE: ./src/utils/constructCategoriesMap.ts
+const constructCategoriesMap = (schema_unit) => {
+    const categories = schema_unit.options
+        .map((option) => ({
+        color: option.color,
+        value: option.value
+    }))
+        .sort((categoryA, categoryB) => categoryA.value > categoryB.value ? 1 : -1);
+    const categories_map = new Map();
+    categories.forEach((category) => {
+        categories_map.set(category.value, Object.assign({ items: [] }, category));
+    });
+    return categories_map;
+};
+
+;// CONCATENATED MODULE: external "querystring"
+const external_querystring_namespaceObject = require("querystring");;
+var external_querystring_default = /*#__PURE__*/__nccwpck_require__.n(external_querystring_namespaceObject);
+;// CONCATENATED MODULE: ./src/utils/constructNewContents.ts
+
+const ColorMap = {
+    default: '505558',
+    gray: '979a9b',
+    brown: '695b55',
+    orange: '9f7445',
+    yellow: '9f9048',
+    green: '467870',
+    blue: '487088',
+    purple: '6c598f',
+    pink: '904d74',
+    red: '9f5c58',
+    teal: '467870'
+};
+const constructNewContents = (categories_map, color_schema_unit_key) => {
+    const newContents = [];
+    for (const [category, category_info] of categories_map) {
+        const content = [
+            `<h3><img height="20px" src="https://img.shields.io/badge/${category}-${ColorMap[category_info.color]}"/></h3>`
+        ];
+        category_info.items.forEach((item) => content.push(`<span><img src="https://img.shields.io/badge/-${external_querystring_default().escape(item.title[0][0])}-${item[color_schema_unit_key][0][0]}?style=flat-square&amp;logo=${external_querystring_default().escape(item.title[0][0])}" alt="${item.title[0][0]}"/></span>`));
+        newContents.push(...content, '<hr>');
+    }
+    return newContents;
+};
+
+;// CONCATENATED MODULE: ./src/utils/getSchemaEntries.ts
+
+const getSchemaEntries = (schema) => {
+    const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'multi_select' &&
+        schema_entry_value.name === 'Category'), color_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'text' &&
+        schema_entry_value.name === 'Color');
+    if (!category_schema_entry)
+        core.setFailed("Couldn't find Category named multi_select type column in the database");
+    if (!color_schema_entry)
+        core.setFailed("Couldn't find Color named text type column in the database");
+    return [category_schema_entry, color_schema_entry];
+};
 
 ;// CONCATENATED MODULE: ./src/index.ts
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -21169,19 +21237,9 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
-const ColorMap = {
-    default: '505558',
-    gray: '979a9b',
-    brown: '695b55',
-    orange: '9f7445',
-    yellow: '9f9048',
-    green: '467870',
-    blue: '487088',
-    purple: '6c598f',
-    pink: '904d74',
-    red: '9f5c58',
-    teal: '467870'
-};
+
+
+
 function main() {
     return src_awaiter(this, void 0, void 0, function* () {
         try {
@@ -21237,57 +21295,27 @@ function main() {
             const collection = collectionData.recordMap.collection[collection_id]
                 .value;
             const { schema } = collection;
-            const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'multi_select' &&
-                schema_entry_value.name === 'Category'), color_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'text' &&
-                schema_entry_value.name === 'Color');
-            if (!category_schema_entry)
-                return core.setFailed("Couldn't find Category named multi_select type column in the database");
-            if (!category_schema_entry)
-                return core.setFailed("Couldn't find Color named text type column in the database");
+            const [category_schema_entry, color_schema_entry] = getSchemaEntries(schema);
             const rows = Object.values(recordMap.block)
                 .filter((block) => block.value.id !== databaseId)
-                .map((block) => block.value);
+                .map((block) => block.value)
+                .sort((rowA, rowB) => rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1);
             if (rows.length === 0)
                 return core.error('No database rows detected');
             else {
-                const categories = category_schema_entry[1].options
-                    .map((option) => ({
-                    color: option.color,
-                    value: option.value
-                }))
-                    .sort((categoryA, categoryB) => categoryA.value > categoryB.value ? 1 : -1);
-                const categories_map = new Map();
-                categories.forEach((category) => {
-                    categories_map.set(category.value, Object.assign({ items: [] }, category));
-                });
-                rows
-                    .sort((rowA, rowB) => rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1)
-                    .forEach((row) => {
+                const categories_map = constructCategoriesMap(category_schema_entry[1]);
+                rows.forEach((row) => {
                     const category = row.properties[category_schema_entry[0]][0][0];
                     if (!category)
                         throw new Error('Each row must have a category value');
                     const category_value = categories_map.get(category);
                     category_value.items.push(row.properties);
                 });
-                const newLines = [];
-                for (const [category, category_info] of categories_map) {
-                    const content = [
-                        `<h3><img height="20px" src="https://img.shields.io/badge/${category}-${ColorMap[category_info.color]}"/></h3>`
-                    ];
-                    category_info.items.forEach((item) => content.push(`<span><img src="https://img.shields.io/badge/-${external_querystring_default().escape(item.title[0][0])}-${item[color_schema_entry[0]][0][0]}?style=flat-square&amp;logo=${external_querystring_default().escape(item.title[0][0])}" alt="${item.title[0][0]}"/></span>`));
-                    newLines.push(...content, '<hr>');
-                }
                 const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
                 core.info(`Reading from ${README_PATH}`);
                 const readmeLines = external_fs_default().readFileSync(README_PATH, 'utf-8').split('\n');
-                let startIdx = readmeLines.findIndex((content) => content.trim() === '<!--START_SECTION:learn-->');
-                if (startIdx === -1) {
-                    return core.setFailed(`Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`);
-                }
-                const endIdx = readmeLines.findIndex((content) => content.trim() === '<!--END_SECTION:learn-->');
-                if (endIdx === -1) {
-                    return core.setFailed(`Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`);
-                }
+                const [startIdx, endIdx] = checkForSections(readmeLines);
+                const newLines = constructNewContents(categories_map, color_schema_entry[0]);
                 const finalLines = [
                     ...readmeLines.slice(0, startIdx + 1),
                     ...newLines,

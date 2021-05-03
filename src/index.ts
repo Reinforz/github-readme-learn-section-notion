@@ -1,30 +1,12 @@
 import * as core from '@actions/core';
 import { NotionEndpoints } from '@nishans/endpoints';
-import {
-  ICollection,
-  ICollectionBlock,
-  IPage,
-  MultiSelectSchemaUnit,
-  TextSchemaUnit,
-  TTextColor
-} from '@nishans/types';
+import { ICollection, ICollectionBlock, IPage } from '@nishans/types';
 import fs from 'fs';
-import qs from 'querystring';
-import { commitFile } from './utils';
-
-const ColorMap: Record<TTextColor | 'green', string> = {
-  default: '505558',
-  gray: '979a9b',
-  brown: '695b55',
-  orange: '9f7445',
-  yellow: '9f9048',
-  green: '467870',
-  blue: '487088',
-  purple: '6c598f',
-  pink: '904d74',
-  red: '9f5c58',
-  teal: '467870'
-};
+import { checkForSections } from './utils/checkForSections';
+import { commitFile } from './utils/commitFile';
+import { constructCategoriesMap } from './utils/constructCategoriesMap';
+import { constructNewContents } from './utils/constructNewContents';
+import { getSchemaEntries } from './utils/getSchemaEntries';
 
 async function main() {
   try {
@@ -101,115 +83,37 @@ async function main() {
     const collection = collectionData.recordMap.collection![collection_id]
       .value as ICollection;
     const { schema } = collection;
-
-    // Validate collection schema
-    const schema_entries = Object.entries(schema),
-      category_schema_entry = schema_entries.find(
-        ([, schema_entry_value]) =>
-          schema_entry_value.type === 'multi_select' &&
-          schema_entry_value.name === 'Category'
-      ) as [string, MultiSelectSchemaUnit],
-      color_schema_entry = schema_entries.find(
-        ([, schema_entry_value]) =>
-          schema_entry_value.type === 'text' &&
-          schema_entry_value.name === 'Color'
-      ) as [string, TextSchemaUnit];
-
-    if (!category_schema_entry)
-      return core.setFailed(
-        "Couldn't find Category named multi_select type column in the database"
-      );
-    if (!category_schema_entry)
-      return core.setFailed(
-        "Couldn't find Color named text type column in the database"
-      );
+    const [category_schema_entry, color_schema_entry] = getSchemaEntries(
+      schema
+    );
 
     const rows = Object.values(recordMap.block)
       .filter((block) => block.value.id !== databaseId)
-      .map((block) => block.value) as IPage[];
+      .map((block) => block.value as IPage)
+      .sort((rowA, rowB) =>
+        rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1
+      );
 
     if (rows.length === 0) return core.error('No database rows detected');
     else {
-      const categories = category_schema_entry[1].options
-        .map((option) => ({
-          color: option.color,
-          value: option.value
-        }))
-        .sort((categoryA, categoryB) =>
-          categoryA.value > categoryB.value ? 1 : -1
-        );
-
-      const categories_map: Map<
-        string,
-        {
-          items: IPage['properties'][];
-          color: TTextColor;
-        }
-      > = new Map();
-
-      categories.forEach((category) => {
-        categories_map.set(category.value, {
-          items: [],
-          ...category
-        });
+      const categories_map = constructCategoriesMap(category_schema_entry[1]);
+      rows.forEach((row) => {
+        const category = row.properties[category_schema_entry[0]][0][0];
+        if (!category) throw new Error('Each row must have a category value');
+        const category_value = categories_map.get(category);
+        category_value!.items.push(row.properties);
       });
-
-      rows
-        .sort((rowA, rowB) =>
-          rowA.properties.title[0][0] > rowB.properties.title[0][0] ? 1 : -1
-        )
-        .forEach((row) => {
-          const category = row.properties[category_schema_entry[0]][0][0];
-          if (!category) throw new Error('Each row must have a category value');
-          const category_value = categories_map.get(category);
-          category_value!.items.push(row.properties);
-        });
-
-      const newLines: string[] = [];
-
-      for (const [category, category_info] of categories_map) {
-        const content = [
-          `<h3><img height="20px" src="https://img.shields.io/badge/${category}-${
-            ColorMap[category_info.color]
-          }"/></h3>`
-        ];
-        category_info.items.forEach((item) =>
-          content.push(
-            `<span><img src="https://img.shields.io/badge/-${qs.escape(
-              item.title[0][0]
-            )}-${
-              item[color_schema_entry[0]][0][0]
-            }?style=flat-square&amp;logo=${qs.escape(item.title[0][0])}" alt="${
-              item.title[0][0]
-            }"/></span>`
-          )
-        );
-        newLines.push(...content, '<hr>');
-      }
 
       const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
       core.info(`Reading from ${README_PATH}`);
 
       const readmeLines = fs.readFileSync(README_PATH, 'utf-8').split('\n');
-      let startIdx = readmeLines.findIndex(
-        (content) => content.trim() === '<!--START_SECTION:learn-->'
+
+      const [startIdx, endIdx] = checkForSections(readmeLines);
+      const newLines = constructNewContents(
+        categories_map,
+        color_schema_entry[0]
       );
-
-      if (startIdx === -1) {
-        return core.setFailed(
-          `Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`
-        );
-      }
-
-      const endIdx = readmeLines.findIndex(
-        (content) => content.trim() === '<!--END_SECTION:learn-->'
-      );
-
-      if (endIdx === -1) {
-        return core.setFailed(
-          `Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`
-        );
-      }
 
       const finalLines = [
         ...readmeLines.slice(0, startIdx + 1),
