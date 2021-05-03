@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ncc build index.js --license licenses.txt"
+    "build": "ncc build src/index.js --license licenses.txt"
   },
   "repository": {
     "type": "git",
