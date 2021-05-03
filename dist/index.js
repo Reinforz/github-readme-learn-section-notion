@@ -4010,21 +4010,30 @@ module.exports.Format = CliFormat;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commitFile = void 0;
 const child_process_1 = __webpack_require__(129);
-const commitFile = async () => {
-    await exec('git', [
+const commitFile = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield exec('git', [
         'config',
         '--global',
         'user.email',
         '41898282+github-actions[bot]@users.noreply.github.com'
     ]);
-    await exec('git', ['config', '--global', 'user.name', 'readme-bot']);
-    await exec('git', ['add', 'README.md']);
-    await exec('git', ['commit', '-m', 'Updated readme with learn section']);
-    await exec('git', ['push']);
-};
+    yield exec('git', ['config', '--global', 'user.name', 'readme-bot']);
+    yield exec('git', ['add', 'README.md']);
+    yield exec('git', ['commit', '-m', 'Updated readme with learn section']);
+    yield exec('git', ['push']);
+});
 exports.commitFile = commitFile;
 const exec = (cmd, args = []) => new Promise((resolve, reject) => {
     const app = child_process_1.spawn(cmd, args, { stdio: 'pipe' });
@@ -8980,6 +8989,15 @@ module.exports = isStream;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9000,127 +9018,126 @@ const ColorMap = {
     pink: '904d74',
     red: '9f5c58'
 };
-async function main() {
-    try {
-        const databaseId = core_1.default.getInput('database_id');
-        const NOTION_TOKEN_V2 = core_1.default.getInput('token_v2');
-        const collectionViewData = await endpoints_1.NotionEndpoints.Queries.syncRecordValues({
-            requests: [
-                {
-                    id: databaseId,
-                    table: 'block',
-                    version: -1
-                }
-            ]
-        }, {
-            token: NOTION_TOKEN_V2,
-            user_id: ''
-        });
-        core_1.default.info('Fetched database');
-        const collectionView = collectionViewData.recordMap.block[databaseId]
-            .value;
-        if (!collectionView) {
-            return core_1.default.setFailed(`Either your NOTION_TOKEN_V2 has expired or a database with id:${databaseId} doesn't exist`);
-        }
-        const collection_id = collectionView.collection_id;
-        const collectionData = await endpoints_1.NotionEndpoints.Queries.syncRecordValues({
-            requests: [
-                {
-                    id: collection_id,
-                    table: 'collection',
-                    version: -1
-                }
-            ]
-        }, {
-            token: NOTION_TOKEN_V2,
-            user_id: ''
-        });
-        core_1.default.info('Fetched collection');
-        const { recordMap } = await endpoints_1.NotionEndpoints.Queries.queryCollection({
-            collectionId: collection_id,
-            collectionViewId: '',
-            query: {},
-            loader: {
-                type: 'table',
-                loadContentCover: false,
-                limit: 10000,
-                userTimeZone: ''
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const databaseId = core_1.default.getInput('database_id');
+            const NOTION_TOKEN_V2 = core_1.default.getInput('token_v2');
+            const collectionViewData = yield endpoints_1.NotionEndpoints.Queries.syncRecordValues({
+                requests: [
+                    {
+                        id: databaseId,
+                        table: 'block',
+                        version: -1
+                    }
+                ]
+            }, {
+                token: NOTION_TOKEN_V2,
+                user_id: ''
+            });
+            core_1.default.info('Fetched database');
+            const collectionView = collectionViewData.recordMap.block[databaseId]
+                .value;
+            if (!collectionView) {
+                return core_1.default.setFailed(`Either your NOTION_TOKEN_V2 has expired or a database with id:${databaseId} doesn't exist`);
             }
-        }, {
-            token: NOTION_TOKEN_V2,
-            user_id: ''
-        });
-        core_1.default.info('Fetched rows');
-        const collection = collectionData.recordMap.collection[collection_id]
-            .value;
-        const { schema } = collection;
-        const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'multi_select' &&
-            schema_entry_value.name === 'Category');
-        if (!category_schema_entry)
-            return core_1.default.setFailed("Couldn't find Category named multi_select type column in the database");
-        const rows = Object.values(recordMap.block)
-            .filter((block) => block.value.id !== databaseId)
-            .map((block) => block.value);
-        if (rows.length === 0)
-            return core_1.default.error('No database rows detected');
-        else {
-            const categories = category_schema_entry[1].options
-                .map((option) => ({
-                color: option.color,
-                value: option.value
-            }))
-                .sort((categoryA, categoryB) => categoryA.value > categoryB.value ? 1 : -1);
-            const categories_map = new Map();
-            categories.forEach((category) => {
-                categories_map.set(category.value, {
-                    items: [],
-                    ...category
+            const collection_id = collectionView.collection_id;
+            const collectionData = yield endpoints_1.NotionEndpoints.Queries.syncRecordValues({
+                requests: [
+                    {
+                        id: collection_id,
+                        table: 'collection',
+                        version: -1
+                    }
+                ]
+            }, {
+                token: NOTION_TOKEN_V2,
+                user_id: ''
+            });
+            core_1.default.info('Fetched collection');
+            const { recordMap } = yield endpoints_1.NotionEndpoints.Queries.queryCollection({
+                collectionId: collection_id,
+                collectionViewId: '',
+                query: {},
+                loader: {
+                    type: 'table',
+                    loadContentCover: false,
+                    limit: 10000,
+                    userTimeZone: ''
+                }
+            }, {
+                token: NOTION_TOKEN_V2,
+                user_id: ''
+            });
+            core_1.default.info('Fetched rows');
+            const collection = collectionData.recordMap.collection[collection_id]
+                .value;
+            const { schema } = collection;
+            const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'multi_select' &&
+                schema_entry_value.name === 'Category');
+            if (!category_schema_entry)
+                return core_1.default.setFailed("Couldn't find Category named multi_select type column in the database");
+            const rows = Object.values(recordMap.block)
+                .filter((block) => block.value.id !== databaseId)
+                .map((block) => block.value);
+            if (rows.length === 0)
+                return core_1.default.error('No database rows detected');
+            else {
+                const categories = category_schema_entry[1].options
+                    .map((option) => ({
+                    color: option.color,
+                    value: option.value
+                }))
+                    .sort((categoryA, categoryB) => categoryA.value > categoryB.value ? 1 : -1);
+                const categories_map = new Map();
+                categories.forEach((category) => {
+                    categories_map.set(category.value, Object.assign({ items: [] }, category));
                 });
-            });
-            rows.forEach((row) => {
-                const category = row.properties[category_schema_entry[0]][0][0];
-                if (!category)
-                    throw new Error('Each row must have a category value');
-                const category_value = categories_map.get(category);
-                category_value.items.push(row.properties.title[0][0]);
-            });
-            const newLines = [];
-            for (const [category, category_info] of categories_map) {
-                const content = [
-                    `<div><img height="20px" src="https://img.shields.io/badge/${category}-${ColorMap[category_info.color]}"/></div>`
+                rows.forEach((row) => {
+                    const category = row.properties[category_schema_entry[0]][0][0];
+                    if (!category)
+                        throw new Error('Each row must have a category value');
+                    const category_value = categories_map.get(category);
+                    category_value.items.push(row.properties.title[0][0]);
+                });
+                const newLines = [];
+                for (const [category, category_info] of categories_map) {
+                    const content = [
+                        `<div><img height="20px" src="https://img.shields.io/badge/${category}-${ColorMap[category_info.color]}"/></div>`
+                    ];
+                    category_info.items.forEach((item) => content.push(`<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`));
+                    newLines.push(...content, '<hr>');
+                }
+                const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
+                core_1.default.info(`Reading from ${README_PATH}`);
+                const readmeLines = fs_1.default.readFileSync(README_PATH, 'utf-8').split('\n');
+                let startIdx = readmeLines.findIndex((content) => content.trim() === '<!--START_SECTION:learn-->');
+                if (startIdx === -1) {
+                    return core_1.default.setFailed(`Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`);
+                }
+                const endIdx = readmeLines.findIndex((content) => content.trim() === '<!--END_SECTION:learn-->');
+                if (endIdx === -1) {
+                    return core_1.default.setFailed(`Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`);
+                }
+                const finalLines = [
+                    ...readmeLines.slice(0, startIdx + 1),
+                    ...newLines,
+                    ...readmeLines.slice(endIdx)
                 ];
-                category_info.items.forEach((item) => content.push(`<img src="https://img.shields.io/badge/-${item}-black?style=flat-square&amp;logo=${item}" alt="${item}">`));
-                newLines.push(...content, '<hr>');
-            }
-            const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
-            core_1.default.info(`Reading from ${README_PATH}`);
-            const readmeLines = fs_1.default.readFileSync(README_PATH, 'utf-8').split('\n');
-            let startIdx = readmeLines.findIndex((content) => content.trim() === '<!--START_SECTION:learn-->');
-            if (startIdx === -1) {
-                return core_1.default.setFailed(`Couldn't find the <!--START_SECTION:learn--> comment. Exiting!`);
-            }
-            const endIdx = readmeLines.findIndex((content) => content.trim() === '<!--END_SECTION:learn-->');
-            if (endIdx === -1) {
-                return core_1.default.setFailed(`Couldn't find the <!--END_SECTION:learn--> comment. Exiting!`);
-            }
-            const finalLines = [
-                ...readmeLines.slice(0, startIdx + 1),
-                ...newLines,
-                ...readmeLines.slice(endIdx)
-            ];
-            core_1.default.info(`Writing to ${README_PATH}`);
-            fs_1.default.writeFileSync(README_PATH, finalLines.join('\n'));
-            try {
-                await utils_1.commitFile();
-            }
-            catch (err) {
-                return core_1.default.setFailed(err.message);
+                core_1.default.info(`Writing to ${README_PATH}`);
+                fs_1.default.writeFileSync(README_PATH, finalLines.join('\n'));
+                try {
+                    yield utils_1.commitFile();
+                }
+                catch (err) {
+                    return core_1.default.setFailed(err.message);
+                }
             }
         }
-    }
-    catch (error) {
-        return core_1.default.setFailed(error.message);
-    }
+        catch (error) {
+            return core_1.default.setFailed(error.message);
+        }
+    });
 }
 main();
 
