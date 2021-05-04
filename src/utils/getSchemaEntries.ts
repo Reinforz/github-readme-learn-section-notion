@@ -1,5 +1,10 @@
 import * as core from '@actions/core';
-import { MultiSelectSchemaUnit, Schema, TextSchemaUnit } from '@nishans/types';
+import {
+  Schema,
+  SelectSchemaUnit,
+  TextSchemaUnit,
+  TitleSchemaUnit
+} from '@nishans/types';
 
 export const getSchemaEntries = (schema: Schema) => {
   const schema_entries = Object.entries(schema),
@@ -7,12 +12,12 @@ export const getSchemaEntries = (schema: Schema) => {
       ([, schema_entry_value]) =>
         schema_entry_value.type === 'select' &&
         schema_entry_value.name === 'Category'
-    ) as [string, MultiSelectSchemaUnit],
+    ) as [string, SelectSchemaUnit],
     name_schema_entry = schema_entries.find(
       ([, schema_entry_value]) =>
         schema_entry_value.type === 'title' &&
         schema_entry_value.name === 'Name'
-    ) as [string, MultiSelectSchemaUnit],
+    ) as [string, TitleSchemaUnit],
     color_schema_entry = schema_entries.find(
       ([, schema_entry_value]) =>
         schema_entry_value.type === 'text' &&
@@ -21,7 +26,7 @@ export const getSchemaEntries = (schema: Schema) => {
 
   if (!category_schema_entry)
     core.setFailed(
-      "Couldn't find Category named multi_select type column in the database"
+      "Couldn't find Category named select type column in the database"
     );
   if (!color_schema_entry)
     core.setFailed(

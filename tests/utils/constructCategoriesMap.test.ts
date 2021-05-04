@@ -16,7 +16,7 @@ it(`Should work`, () => {
   const categories_map = constructCategoriesMap({
     name: 'Options',
     options: [option_1, option_2, option_3],
-    type: 'multi_select'
+    type: 'select'
   });
 
   expect(Array.from(categories_map.entries())).toStrictEqual([

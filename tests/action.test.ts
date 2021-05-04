@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import { NotionEndpoints } from '@nishans/endpoints';
-import { MultiSelectSchemaUnit, Schema } from '@nishans/types';
+import { Schema, SelectSchemaUnit } from '@nishans/types';
 import fs from 'fs';
 import { action } from '../src/action';
 import { ActionUtils } from '../src/utils';
@@ -13,7 +13,7 @@ it(`Should work`, async () => {
   const GITHUB_WORKSPACE = `https://github.com/Devorein/github-readme-learn-section-notion`;
   process.env.GITHUB_WORKSPACE = GITHUB_WORKSPACE;
 
-  const category_schema_unit: MultiSelectSchemaUnit = {
+  const category_schema_unit: SelectSchemaUnit = {
       name: 'Category',
       options: [
         {
@@ -27,7 +27,7 @@ it(`Should work`, async () => {
           value: 'Library'
         }
       ],
-      type: 'multi_select'
+      type: 'select'
     },
     block_3 = {
       id: 'block_3',
@@ -103,7 +103,8 @@ it(`Should work`, async () => {
   jest.spyOn(ActionUtils, 'getSchemaEntries').mockImplementationOnce(() => {
     return [
       ['category', category_schema_unit],
-      ['color', { name: 'Color', type: 'text' }]
+      ['color', { name: 'Color', type: 'text' }],
+      ['title', { name: 'Name', type: 'title' }]
     ];
   });
 
@@ -165,7 +166,7 @@ it(`Should work`, async () => {
   );
   expect(getInputMock).toHaveBeenNthCalledWith(1, 'token_v2');
   expect(getInputMock).toHaveBeenNthCalledWith(2, 'database_id');
-  expect(fetchDataMock).toHaveBeenNthCalledWith(1, 'block_1', 'block');
+  expect(fetchDataMock).toHaveBeenNthCalledWith(1, 'block_1----', 'block');
   expect(fetchDataMock).toHaveBeenNthCalledWith(
     2,
     'collection_1',

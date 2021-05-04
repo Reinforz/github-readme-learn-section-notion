@@ -27,3 +27,17 @@ it('Should Work', () => {
     '<hr>'
   ]);
 });
+
+it('Should throw error if title not present', () => {
+  const categories_map = new Map([
+    [
+      'Tech Tools',
+      {
+        items: [{}],
+        color: 'teal'
+      }
+    ]
+  ]) as any;
+
+  expect(() => constructNewContents(categories_map, 'color')).toThrow();
+});

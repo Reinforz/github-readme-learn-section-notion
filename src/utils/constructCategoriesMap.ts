@@ -1,7 +1,7 @@
-import { MultiSelectSchemaUnit } from '@nishans/types';
+import { SelectSchemaUnit } from '@nishans/types';
 import { ICategoryMap } from '../types';
 
-export const constructCategoriesMap = (schema_unit: MultiSelectSchemaUnit) => {
+export const constructCategoriesMap = (schema_unit: SelectSchemaUnit) => {
   const categories = schema_unit.options
     .map((option) => ({
       color: option.color,
