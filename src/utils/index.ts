@@ -5,6 +5,7 @@ import { constructNewContents } from './constructNewContents';
 import { fetchData } from './fetchData';
 import { getSchemaEntries } from './getSchemaEntries';
 import { modifyRows } from './modifyRows';
+import { populateCategoriesMapItems } from './populateCategoriesMapItems';
 
 export const ActionUtils = {
   checkForSections,
@@ -13,5 +14,6 @@ export const ActionUtils = {
   constructNewContents,
   fetchData,
   getSchemaEntries,
-  modifyRows
+  modifyRows,
+  populateCategoriesMapItems
 };

@@ -134,7 +134,7 @@ it(`Should work`, async () => {
     .spyOn(fs, 'readFileSync')
     .mockImplementationOnce(
       () =>
-        '# Header\n\nfirst\n<!--START_SECTION:learn-->\n<!--END_SECTION:learn-->\nsecond'
+        '# Header\nfirst\n<!--START_SECTION:learn-->\n<!--END_SECTION:learn-->\nsecond'
     );
   jest
     .spyOn(ActionUtils, 'checkForSections')
