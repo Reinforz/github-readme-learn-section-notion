@@ -1,4 +1,4 @@
-<p align="center"><a href="/" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/Devorein/github-readme-learn-section-notion/master/media/Logo.png" alt="Logo"></a></p>
+<p align="center"><a href="/" rel="noopener noreferrer"><img width="500px" src="https://raw.githubusercontent.com/Devorein/github-readme-learn-section-notion/master/media/Logo.png" alt="Logo"></a></p>
 
 <h1 align="center">Github Readme Learn Section - <i>Github Action</i></h1>
 <div align="center"><b>Automatically update your github README learn section with data fetched from a remote notion database.</b></div>
