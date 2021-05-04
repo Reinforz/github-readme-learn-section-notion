@@ -21,24 +21,24 @@ export const constructNewContents = (
   color_schema_unit_key: string
 ) => {
   const newContents: string[] = [];
-
   for (const [category, category_info] of categories_map) {
     const content = [
       `<h3><img height="20px" src="https://img.shields.io/badge/${qs.escape(
         category
       )}-${ColorMap[category_info.color]}"/></h3>`
     ];
-    category_info.items.forEach((item) =>
+    category_info.items.forEach((item) => {
+      const title = item.title && item.title[0][0];
+      if (!title)
+        throw new Error(`Each row must have value in the Name column`);
       content.push(
-        `<span><img src="https://img.shields.io/badge/-${qs.escape(
-          item.title[0][0]
-        )}-${
+        `<span><img src="https://img.shields.io/badge/-${qs.escape(title)}-${
           item[color_schema_unit_key]?.[0][0] ?? 'black'
-        }?style=flat-square&amp;logo=${qs.escape(item.title[0][0])}" alt="${
-          item.title[0][0]
-        }"/></span>`
-      )
-    );
+        }?style=flat-square&amp;logo=${qs.escape(
+          title
+        )}" alt="${title}"/></span>`
+      );
+    });
     newContents.push(...content, '<hr>');
   }
   return newContents;
