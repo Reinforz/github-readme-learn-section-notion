@@ -6,7 +6,11 @@ import { ActionUtils } from './utils';
 
 export async function action() {
   const NOTION_TOKEN_V2 = core.getInput('token_v2');
-  const databaseId = core.getInput('database_id');
+  let id = core.getInput('database_id').replace(/-/g, '');
+  const databaseId = `${id.substr(0, 8)}-${id.substr(8, 4)}-${id.substr(
+    12,
+    4
+  )}-${id.substr(16, 4)}-${id.substr(20)}`;
 
   const collectionView = await ActionUtils.fetchData<TCollectionBlock>(
     databaseId,

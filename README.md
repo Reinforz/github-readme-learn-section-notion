@@ -47,8 +47,10 @@ jobs:
         uses: 'devorein/github-readme-learn-section-notion@master'
         with:
           database_id: '6626c1ebc5a44db78e3f2fe285171ab7'
-          token_v2: ${{ secrets.NOTION_TOKEN_V2 }}
+          token_v2: ${{ secrets.NOTION_TOKEN_V2 }} # Required only if your database is private
 ```
+
+**TIP**: You can test out using [this template](https://www.notion.so/devorein/6c46c1ebc5a44db78e3f5fe285071ab6?v=0bc36e7c59e54f34b0838956e35b4490) that I've created.
 
 ### In your notion account
 
@@ -75,7 +77,15 @@ with:
   database_id: '6626c1ebc5a44db78e3f2fe285171ab7'
 ```
 
-#### 4. Get your notion `token_v2`
+Follow the rest of the steps only if your database is not public, if its public you don't need to set the token_v2
+
+#### To make your database public
+
+1. Navigate to the database in your notion account
+2. Click on Share at the top right corner
+3. Click on Share to Web button.
+
+#### 1. Get your notion `token_v2`
 
 **NOTE**: By no means should you share or expose your notion `token_v2`. If you feel like you've done so accidentally, immediately log out from that account in all of your devices.
 
@@ -87,7 +97,7 @@ Follow the steps below to obtain your `token_v2`:
 
 **NOTE**: Its highly recommended to store your `token_v2` as a github secret rather than pasting it in your workflow file.
 
-#### 5. Create a github secret to store `token_v2`
+#### 2. Create a github secret to store `token_v2`
 
 1. navigate to the url `https://github.com/<USERNAME>/<REPO-NAME>/settings/secrets/actions`
 2. Click on `New repository secret`

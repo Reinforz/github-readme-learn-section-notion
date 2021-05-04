@@ -7,8 +7,8 @@ inputs:
     description: "The id of the database"
     required: true
   token_v2:
-    description: "Your notion token_v2 string"
-    required: true
+    description: "Your notion token_v2 string, required only for private databases"
+    required: false
 
 branding:
   icon: "box"
