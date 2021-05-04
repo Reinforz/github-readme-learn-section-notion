@@ -17,3 +17,7 @@ jobs:
       - run: npm ci
       - run: npm run test
       - run: npm run build
+      - name: Uploading test coverage reports
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/scripts/codecov.sh"
+          "${GITHUB_WORKSPACE}/scripts/codecov.sh"
