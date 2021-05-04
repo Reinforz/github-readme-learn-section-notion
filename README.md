@@ -2,7 +2,7 @@
 <div align="center"><b>Automatically update your github README learn section with data fetched from a remote notion database.</b></div>
 </br>
 <p align="center">
-  <a href="https://app.codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master"><img src="https://img.shields.io/codecov/c/github/devorein/github-readme-learn-section-notion?color=blue"/></a>
+  <a href="https://app.codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master"><img src="https://codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master/graph/badge.svg"/></a>
   <a href="https://github.com/Devorein/github-readme-learn-section-notion/actions/workflows/build.yml"><img src="https://github.com/devorein/github-readme-learn-section-notion/actions/workflows/build.yml/badge.svg"/></a>
   <img src="https://img.shields.io/github/repo-size/devorein/github-readme-learn-section-notion?style=flat-square&color=orange"/>
   <img src="https://img.shields.io/github/contributors/devorein/github-readme-learn-section-notion?label=contributors&color=red"/>
@@ -10,10 +10,10 @@
 
 ## Configuration
 
-|    Option     |                    Description                    | Default |
-| :-----------: | :-----------------------------------------------: | :-----: |
-| `database_id` | Set this to the id of your remote notion database |    -    |
-|  `token_v2`   |        Set this to your notion `token_v2`         |    -    |
+|    Option     |                    Description                    | Required | Default |
+| :-----------: | :-----------------------------------------------: | :------: | :-----: |
+| `database_id` | Set this to the id of your remote notion database |   true   |    -    |
+|  `token_v2`   |        Set this to your notion `token_v2`         |  false   |    -    |
 
 ## Usage
 
