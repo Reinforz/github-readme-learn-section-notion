@@ -23,9 +23,7 @@
   "homepage": "https://github.com/Devorein/github-action-learn-section-notion#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
-    "@nishans/endpoints": "^0.0.32",
-    "@vercel/ncc": "^0.28.5",
-    "typescript": "^4.2.4"
+    "@nishans/endpoints": "^0.0.32"
   },
   "devDependencies": {
     "@nishans/types": "^0.0.35",
@@ -33,6 +31,8 @@
     "@types/node": "^15.0.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
-    "ts-jest": "^26.5.5"
+    "ts-jest": "^26.5.5",
+    "@vercel/ncc": "^0.28.5",
+    "typescript": "^4.2.4"
   }
 }
