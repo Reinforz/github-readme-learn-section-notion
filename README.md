@@ -1,3 +1,5 @@
+<p align="center"><a href="/" rel="noopener noreferrer"><img src="https://github.com/Devorein/Nishan/blob/master/media/Logo.png" alt="Logo"></a></p>
+
 <h1 align="center">Github Readme Learn Section - <i>Github Action</i></h1>
 <div align="center"><b>Automatically update your github README learn section with data fetched from a remote notion database.</b></div>
 </br>
