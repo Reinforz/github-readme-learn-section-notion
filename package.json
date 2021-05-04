@@ -1,5 +1,5 @@
 {
-  "name": "github-action-learn-section-notion",
+  "name": "github-readme-learn-section-notion",
   "version": "1.0.0",
   "description": "A github action to populate readme learn section with data fetched from a remote notion database",
   "main": "dist/index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Devorein/github-action-learn-section-notion.git"
+    "url": "git+https://github.com/Devorein/github-readme-learn-section-notion.git"
   },
   "keywords": [],
   "author": "Safwan Shaheer <devorein00@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Devorein/github-action-learn-section-notion/issues"
+    "url": "https://github.com/Devorein/github-readme-learn-section-notion/issues"
   },
-  "homepage": "https://github.com/Devorein/github-action-learn-section-notion#readme",
+  "homepage": "https://github.com/Devorein/github-readme-learn-section-notion#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
     "@nishans/endpoints": "^0.0.32"

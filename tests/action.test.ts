@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 it(`Should work`, async () => {
-  const GITHUB_WORKSPACE = `https://github.com/Devorein/github-action-learn-section-notion`;
+  const GITHUB_WORKSPACE = `https://github.com/Devorein/github-readme-learn-section-notion`;
   process.env.GITHUB_WORKSPACE = GITHUB_WORKSPACE;
 
   const category_schema_unit: MultiSelectSchemaUnit = {

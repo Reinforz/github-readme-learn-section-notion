@@ -2,10 +2,10 @@
 <div align="center"><b>Automatically update your github README learn section with data fetched from a remote notion database.</b></div>
 </br>
 <p align="center">
-  <a href="https://app.codecov.io/gh/Devorein/github-action-learn-section-notion/branch/master"><img src="https://img.shields.io/codecov/c/github/devorein/github-action-learn-section-notion?color=blue"/></a>
-  <a href="https://github.com/Devorein/github-action-learn-section-notion/actions/workflows/build.yml"><img src="https://github.com/devorein/github-action-learn-section-notion/actions/workflows/build.yml/badge.svg"/></a>
-  <img src="https://img.shields.io/github/repo-size/devorein/github-action-learn-section-notion?style=flat-square&color=orange"/>
-  <img src="https://img.shields.io/github/contributors/devorein/github-action-learn-section-notion?label=contributors&color=red"/>
+  <a href="https://app.codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master"><img src="https://img.shields.io/codecov/c/github/devorein/github-readme-learn-section-notion?color=blue"/></a>
+  <a href="https://github.com/Devorein/github-readme-learn-section-notion/actions/workflows/build.yml"><img src="https://github.com/devorein/github-readme-learn-section-notion/actions/workflows/build.yml/badge.svg"/></a>
+  <img src="https://img.shields.io/github/repo-size/devorein/github-readme-learn-section-notion?style=flat-square&color=orange"/>
+  <img src="https://img.shields.io/github/contributors/devorein/github-readme-learn-section-notion?label=contributors&color=red"/>
 </p>
 
 ## Configuration
@@ -44,7 +44,7 @@ jobs:
       - name: 'Fetching Repository Contents'
         uses: actions/checkout@main
       - name: 'Learn Section Updater'
-        uses: 'devorein/github-action-learn-section-notion@master'
+        uses: 'devorein/github-readme-learn-section-notion@master'
         with:
           database_id: '6626c1ebc5a44db78e3f2fe285171ab7'
           token_v2: ${{ secrets.NOTION_TOKEN_V2 }}
