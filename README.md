@@ -52,7 +52,7 @@ jobs:
           token_v2: ${{ secrets.NOTION_TOKEN_V2 }} # Required only if your database is private
 ```
 
-**TIP**: You can test out using [this template](https://www.notion.so/devorein/6c46c1ebc5a44db78e3f5fe285071ab6?v=0bc36e7c59e54f34b0838956e35b4490) that I've created.
+**TIP**: You can test out using [this template](https://www.notion.so/devorein/6c46c1ebc5a44db78e3f5fe285071ab6?v=0bc36e7c59e54f34b0838956e35b4490) that I've created, or [this repo](https://github.com/Devorein/test-github-action).
 
 ### In your notion account
 
