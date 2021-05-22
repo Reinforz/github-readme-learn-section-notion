@@ -1,7 +1,7 @@
 <p align="center"><a href="/" rel="noopener noreferrer"><img width="500px" src="https://raw.githubusercontent.com/Devorein/github-readme-learn-section-notion/master/media/Logo.png" alt="Logo"></a></p>
 
 <h1 align="center">Github Readme Learn Section - <i>Github Action</i></h1>
-<div align="center"><b>Automatically update your github README learn section with data fetched from a remote notion database.</b></div>
+<div align="center"><b>Automatically update your github README with data fetched from a remote notion database.</b></div>
 </br>
 <p align="center">
   <a href="https://app.codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master"><img src="https://codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master/graph/badge.svg"/></a>
@@ -15,7 +15,7 @@
 |    Option     |                    Description                    | Required | Default |
 | :-----------: | :-----------------------------------------------: | :------: | :-----: |
 | `database_id` | Set this to the id of your remote notion database |   true   |    -    |
-|  `token_v2`   |        Set this to your notion `token_v2`         |  false   |    -    |
+|  `token_v2`   |        Set this to your notion `token_v2` (Required only for private databases)         |  false   |    -    |
 
 ## Usage
 
