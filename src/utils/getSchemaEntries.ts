@@ -8,10 +8,10 @@ import {
 
 export const getSchemaEntries = (schema: Schema) => {
   const schemaEntries = Object.entries(schema);
-  let categorySchemaEntry: [string, SelectSchemaUnit] | undefined = undefined,
-    nameSchemaEntry: [string, TitleSchemaUnit] | undefined = undefined,
-    colorSchemaEntry: [string, TextSchemaUnit] | undefined = undefined,
-    base64SchemaEntry: [string, TextSchemaUnit] | undefined = undefined;
+  let categorySchemaEntry: [string, SelectSchemaUnit] = undefined as any,
+    nameSchemaEntry: [string, TitleSchemaUnit] = undefined as any,
+    colorSchemaEntry: [string, TextSchemaUnit] = undefined as any,
+    base64SchemaEntry: [string, TextSchemaUnit] = undefined as any;
 
   schemaEntries.forEach((schemaEntry) => {
     if (schemaEntry[1].type === 'text' && schemaEntry[1].name === 'Color') {

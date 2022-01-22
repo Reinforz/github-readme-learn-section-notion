@@ -17,26 +17,30 @@ const ColorMap: Record<TTextColor | 'green', string> = {
 };
 
 export const constructNewContents = (
-  categories_map: ICategoryMap,
-  color_schema_unit_key: string
+  categoriesMap: ICategoryMap,
+  colorSchemaUnitKey: string,
+  base64SchemaUnitKey: string
 ) => {
   const newContents: string[] = [];
-  for (const [category, category_info] of categories_map) {
+  for (const [category, categoryInfo] of categoriesMap) {
     const content = [
       `<h3><img height="20px" src="https://img.shields.io/badge/${qs.escape(
         category
-      )}-${ColorMap[category_info.color]}"/></h3>`
+      )}-${ColorMap[categoryInfo.color]}"/></h3>`
     ];
-    category_info.items.forEach((item) => {
+    categoryInfo.items.forEach((item) => {
       const title = item.title && item.title[0][0];
       if (!title)
         throw new Error(`Each row must have value in the Name column`);
+      let logo: string = qs.escape(title);
+      // At first check if the user provided a base64 encoded svg logo
+      if (item[base64SchemaUnitKey]?.[0][0]) {
+        logo = item[base64SchemaUnitKey][0][0];
+      }
       content.push(
         `<span><img src="https://img.shields.io/badge/-${qs.escape(title)}-${
-          item[color_schema_unit_key]?.[0][0] ?? 'black'
-        }?style=flat-square&amp;logo=${qs.escape(
-          title
-        )}" alt="${title}"/></span>`
+          item[colorSchemaUnitKey]?.[0][0] ?? 'black'
+        }?style=flat-square&amp;logo=${logo}" alt="${title}"/></span>`
       );
     });
     newContents.push(...content, '<hr>');

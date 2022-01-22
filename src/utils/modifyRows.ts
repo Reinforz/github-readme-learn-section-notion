@@ -1,5 +1,11 @@
 import { IPage, RecordMap } from '@nishans/types';
 
+/**
+ * Sorts an array of page blocks by their title
+ * @param recordMap Record map to sort blocks from
+ * @param databaseId Database id to filter block
+ * @returns An array of pages sorted by their title
+ */
 export const modifyRows = (
   recordMap: Pick<RecordMap, 'block'>,
   databaseId: string

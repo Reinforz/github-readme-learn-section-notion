@@ -71,18 +71,20 @@ export async function action() {
     core.info('Fetched rows');
     const { schema } = collection;
     const [
-      category_schema_entry,
-      color_schema_entry
+      categorySchemaEntry,
+      colorSchemaEntry,
+      ,
+      base64SchemaEntry
     ] = ActionUtils.getSchemaEntries(schema);
 
     const rows = ActionUtils.modifyRows(recordMap, databaseId);
-    const categories_map = ActionUtils.constructCategoriesMap(
-      category_schema_entry[1]
+    const categoriesMap = ActionUtils.constructCategoriesMap(
+      categorySchemaEntry[1]
     );
     ActionUtils.populateCategoriesMapItems(
       rows,
-      category_schema_entry[0],
-      categories_map
+      categorySchemaEntry[0],
+      categoriesMap
     );
 
     const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
@@ -92,8 +94,9 @@ export async function action() {
 
     const [startIdx, endIdx] = ActionUtils.checkForSections(readmeLines);
     const newLines = ActionUtils.constructNewContents(
-      categories_map,
-      color_schema_entry[0]
+      categoriesMap,
+      colorSchemaEntry[0],
+      base64SchemaEntry[0]
     );
 
     const finalLines = [
