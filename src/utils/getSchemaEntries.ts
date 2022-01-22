@@ -7,38 +7,49 @@ import {
 } from '@nishans/types';
 
 export const getSchemaEntries = (schema: Schema) => {
-  const schema_entries = Object.entries(schema),
-    category_schema_entry = schema_entries.find(
-      ([, schema_entry_value]) =>
-        schema_entry_value.type === 'select' &&
-        schema_entry_value.name === 'Category'
-    ) as [string, SelectSchemaUnit],
-    name_schema_entry = schema_entries.find(
-      ([, schema_entry_value]) =>
-        schema_entry_value.type === 'title' &&
-        schema_entry_value.name === 'Name'
-    ) as [string, TitleSchemaUnit],
-    color_schema_entry = schema_entries.find(
-      ([, schema_entry_value]) =>
-        schema_entry_value.type === 'text' &&
-        schema_entry_value.name === 'Color'
-    ) as [string, TextSchemaUnit];
+  const schemaEntries = Object.entries(schema);
+  let categorySchemaEntry: [string, SelectSchemaUnit] | undefined = undefined,
+    nameSchemaEntry: [string, TitleSchemaUnit] | undefined = undefined,
+    colorSchemaEntry: [string, TextSchemaUnit] | undefined = undefined,
+    base64SchemaEntry: [string, TextSchemaUnit] | undefined = undefined;
 
-  if (!category_schema_entry)
+  schemaEntries.forEach((schemaEntry) => {
+    if (schemaEntry[1].type === 'text' && schemaEntry[1].name === 'Color') {
+      colorSchemaEntry = schemaEntry as [string, TextSchemaUnit];
+    } else if (
+      schemaEntry[1].type === 'title' &&
+      schemaEntry[1].name === 'Name'
+    ) {
+      nameSchemaEntry = schemaEntry as [string, TitleSchemaUnit];
+    } else if (
+      schemaEntry[1].type === 'select' &&
+      schemaEntry[1].name === 'Category'
+    ) {
+      categorySchemaEntry = schemaEntry as [string, SelectSchemaUnit];
+    } else if (
+      schemaEntry[1].type === 'text' &&
+      schemaEntry[1].name === 'Base64'
+    ) {
+      base64SchemaEntry = schemaEntry as [string, TextSchemaUnit];
+    }
+  });
+
+  if (!categorySchemaEntry)
     core.setFailed(
       "Couldn't find Category named select type column in the database"
     );
-  if (!color_schema_entry)
+  if (!nameSchemaEntry)
     core.setFailed(
       "Couldn't find Color named text type column in the database"
     );
-  if (!name_schema_entry)
+  if (!colorSchemaEntry)
     core.setFailed(
       "Couldn't find Name named title type column in the database"
     );
   return [
-    category_schema_entry,
-    color_schema_entry,
-    name_schema_entry
+    categorySchemaEntry,
+    colorSchemaEntry,
+    nameSchemaEntry,
+    base64SchemaEntry
   ] as const;
 };

@@ -62,11 +62,12 @@ jobs:
 
 **NOTE**: Your database must maintain the following structure/schema
 
-|   Name   |  Type  | Required | Default |               Description               |                                      Value                                      |      Example      |
-| :------: | :----: | :------: | :-----: | :-------------------------------------: | :-----------------------------------------------------------------------------: | :---------------: |
-|   Name   | title  |   true   |    -    |   The name of the item you've learnt    | Must be a valid icon from `https://simple-icons.github.io/simple-icons-website` | React, Typescript |
-| Category | select |   true   |    -    | The category under which the item falls |                                   Any string                                    | Language, Library |
-|  Color   |  text  |  false   |  black  |      Background Color of the badge      |               Any keyword color or hex value without alpha and #                |    red,00ff00     |
+|   Name   |  Type  | Required | Default |               Description               |                                      Value                                      |                 Example                  |
+| :------: | :----: | :------: | :-----: | :-------------------------------------: | :-----------------------------------------------------------------------------: | :--------------------------------------: |
+|   Name   | title  |   true   |    -    |   The name of the item you've learnt    | Must be a valid icon from `https://simple-icons.github.io/simple-icons-website` |            React, Typescript             |
+| Category | select |   true   |    -    | The category under which the item falls |                                   Any string                                    |            Language, Library             |
+|  Color   |  text  |  false   |  black  |      Background Color of the badge      |               Any keyword color or hex value without alpha and #                |                red,00ff00                |
+|  Base64  |  text  |  false   |   ""    |      Custom base64 of the svg logo      |                             Any base64 encoded svg                              | data:image/svg%2bxml;base64,PHN2ZyB4b... |
 
 #### 2. Get the id of the database
 
