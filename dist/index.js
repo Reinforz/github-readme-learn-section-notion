@@ -1747,6 +1747,7 @@ function action() {
             yield ActionUtils.commitFile();
         }
         catch (err) {
+            core.error(err.message);
             core.setFailed(err.message);
         }
     });

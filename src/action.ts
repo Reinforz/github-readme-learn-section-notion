@@ -110,6 +110,7 @@ export async function action() {
     fs.writeFileSync(README_PATH, finalLines.join('\n'), 'utf-8');
     await ActionUtils.commitFile();
   } catch (err) {
+    core.error(err.message);
     core.setFailed(err.message);
   }
 }
