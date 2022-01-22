@@ -1,14 +1,15 @@
 import * as core from '@actions/core';
-import { NotionEndpoints } from '@nishans/endpoints';
+import { HttpClient } from '@actions/http-client';
 import { RecordMap, TData } from '@nishans/types';
 
 export const fetchData = async <T extends TData>(
   id: string,
-  table: keyof RecordMap
+  table: keyof RecordMap,
+  http: HttpClient
 ) => {
-  const NOTION_TOKEN_V2 = core.getInput('token_v2');
-  const response = await NotionEndpoints.Queries.syncRecordValues(
-    {
+  const response = await http.post(
+    `https://www.notion.so/api/v3/syncRecordValues`,
+    JSON.stringify({
       requests: [
         {
           id,
@@ -16,14 +17,14 @@ export const fetchData = async <T extends TData>(
           version: -1
         }
       ]
-    },
-    {
-      token: NOTION_TOKEN_V2,
-      user_id: ''
-    }
+    })
   );
 
-  const data = response.recordMap[table]![id].value as T;
+  const body = JSON.parse(await response.readBody()) as {
+    recordMap: RecordMap;
+  };
+
+  const data = body.recordMap[table]![id].value as T;
 
   if (!data) {
     core.setFailed(

@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Devorein/github-readme-learn-section-notion#readme",
   "dependencies": {
     "@actions/core": "^1.2.7",
-    "@nishans/endpoints": "^0.0.32"
+    "@actions/http-client": "^1.0.11"
   },
   "devDependencies": {
     "@nishans/types": "^0.0.35",

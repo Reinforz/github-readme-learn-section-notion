@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
-import { NotionEndpoints } from '@nishans/endpoints';
-import { ICollection, TCollectionBlock } from '@nishans/types';
+import { HttpClient } from '@actions/http-client';
+import { IRequestOptions } from '@actions/http-client/interfaces';
+import { ICollection, RecordMap, TCollectionBlock } from '@nishans/types';
 import fs from 'fs';
 import { ActionUtils } from './utils';
 
@@ -12,24 +13,45 @@ export async function action() {
     4
   )}-${id.substr(16, 4)}-${id.substr(20)}`;
 
+  const headers: IRequestOptions['headers'] = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  };
+
+  if (NOTION_TOKEN_V2) {
+    headers.cookie = `token_v2=${NOTION_TOKEN_V2}`;
+  }
+
+  let http = new HttpClient(undefined, undefined, {
+    headers
+  });
+
   const collectionView = await ActionUtils.fetchData<TCollectionBlock>(
     databaseId,
-    'block'
+    'block',
+    http
   );
   core.info('Fetched database');
 
   const collection_id = collectionView.collection_id;
   const collection = await ActionUtils.fetchData<ICollection>(
     collection_id,
-    'collection'
+    'collection',
+    http
   );
 
   core.info('Fetched collection');
 
-  const { recordMap } = await NotionEndpoints.Queries.queryCollection(
-    {
-      collectionId: collection_id,
-      collectionViewId: '',
+  const response = await http.post(
+    `https://www.notion.so/api/v3/queryCollection`,
+    JSON.stringify({
+      collection: {
+        id: collection_id,
+        spaceId: collectionView.space_id
+      },
+      collectionView: {
+        id: collectionView.view_ids[0]
+      },
       query: {},
       loader: {
         type: 'table',
@@ -37,12 +59,12 @@ export async function action() {
         limit: 10000,
         userTimeZone: ''
       }
-    },
-    {
-      token: NOTION_TOKEN_V2,
-      user_id: ''
-    }
+    })
   );
+
+  const { recordMap } = JSON.parse(await response.readBody()) as {
+    recordMap: RecordMap;
+  };
 
   core.info('Fetched rows');
   const { schema } = collection;
