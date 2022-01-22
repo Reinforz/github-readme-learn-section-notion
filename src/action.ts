@@ -50,12 +50,15 @@ export async function action() {
         id: collectionView.view_ids[0],
         spaceId: collectionView.space_id
       },
-      query: {},
       loader: {
-        type: 'table',
-        loadContentCover: false,
-        limit: 10000,
-        userTimeZone: ''
+        type: 'reducer',
+        reducers: {
+          collection_group_results: {
+            type: 'results'
+          }
+        },
+        searchQuery: '',
+        userTimeZone: 'Asia/Dhaka'
       }
     })
   );
