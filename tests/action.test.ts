@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { NotionEndpoints } from '@nishans/endpoints';
+import { HttpClient } from '@actions/http-client';
 import { Schema, SelectSchemaUnit } from '@nishans/types';
 import fs from 'fs';
 import { action } from '../src/action';
@@ -80,11 +80,13 @@ it(`Should work`, async () => {
     .mockImplementationOnce(() => 'token_v2')
     .mockImplementationOnce(() => 'block_1');
   const coreInfo = jest.spyOn(core, 'info');
-  const fetchDataMock = jest
+  jest
     .spyOn(ActionUtils, 'fetchData')
     .mockImplementationOnce(async () => {
       return {
-        collection_id: 'collection_1'
+        collection_id: 'collection_1',
+        space_id: 'space_id',
+        view_ids: ['view_1']
       } as any;
     })
     .mockImplementationOnce(async () => {
@@ -92,13 +94,16 @@ it(`Should work`, async () => {
         schema
       } as any;
     });
-  const queryCollectionMock = jest
-    .spyOn(NotionEndpoints.Queries, 'queryCollection')
-    .mockImplementationOnce(async () => {
-      return {
-        recordMap
-      } as any;
-    });
+
+  let http = new HttpClient();
+
+  jest.spyOn(http, 'post' as any).mockImplementationOnce(async () => {
+    return {
+      async resBody() {
+        return JSON.stringify({ recordMap });
+      }
+    };
+  });
 
   jest.spyOn(ActionUtils, 'getSchemaEntries').mockImplementationOnce(() => {
     return [
@@ -166,29 +171,6 @@ it(`Should work`, async () => {
   );
   expect(getInputMock).toHaveBeenNthCalledWith(1, 'token_v2');
   expect(getInputMock).toHaveBeenNthCalledWith(2, 'database_id');
-  expect(fetchDataMock).toHaveBeenNthCalledWith(1, 'block_1----', 'block');
-  expect(fetchDataMock).toHaveBeenNthCalledWith(
-    2,
-    'collection_1',
-    'collection'
-  );
-  expect(queryCollectionMock).toHaveBeenCalledWith(
-    {
-      collectionId: 'collection_1',
-      collectionViewId: '',
-      query: {},
-      loader: {
-        type: 'table',
-        loadContentCover: false,
-        limit: 10000,
-        userTimeZone: ''
-      }
-    },
-    {
-      token: 'token_v2',
-      user_id: ''
-    }
-  );
   expect(readFileSyncMock).toHaveBeenCalledWith(
     `${GITHUB_WORKSPACE}/README.md`,
     'utf-8'

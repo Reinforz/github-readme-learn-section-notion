@@ -15,14 +15,11 @@ export async function action() {
 
   const headers: IRequestOptions['headers'] = {
     Accept: 'application/json',
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    cookie: `token_v2=${NOTION_TOKEN_V2}`
   };
 
-  if (NOTION_TOKEN_V2) {
-    headers.cookie = `token_v2=${NOTION_TOKEN_V2}`;
-  }
-
-  let http = new HttpClient(undefined, undefined, {
+  const http = new HttpClient(undefined, undefined, {
     headers
   });
 
@@ -50,7 +47,8 @@ export async function action() {
         spaceId: collectionView.space_id
       },
       collectionView: {
-        id: collectionView.view_ids[0]
+        id: collectionView.view_ids[0],
+        spaceId: collectionView.space_id
       },
       query: {},
       loader: {
