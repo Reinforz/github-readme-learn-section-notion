@@ -1,7 +1,7 @@
 {
   "name": "github-readme-learn-section-notion",
-  "version": "1.0.0",
-  "description": "A github action to populate github readme learn section with data fetched from a remote notion database",
+  "version": "1.0.2",
+  "description": "A github action to auto-populate github readme learn section with data fetched from a remote notion database",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "npm run format && npm run transpile",

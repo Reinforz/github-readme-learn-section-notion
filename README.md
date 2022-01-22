@@ -1,7 +1,7 @@
 <p align="center"><a href="/" rel="noopener noreferrer"><img width="500px" src="https://raw.githubusercontent.com/Devorein/github-readme-learn-section-notion/master/media/Logo.png" alt="Logo"></a></p>
 
 <h1 align="center">Github Readme Learn Section - <i>Github Action</i></h1>
-<div align="center"><b>Automatically update your github README with data fetched from a remote notion database.</b></div>
+<div align="center"><b>Automatically update your github README with data fetched from a notion database</b></div>
 </br>
 <p align="center">
   <a href="https://app.codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master"><img src="https://codecov.io/gh/Devorein/github-readme-learn-section-notion/branch/master/graph/badge.svg"/></a>
@@ -12,10 +12,10 @@
 
 ## Configuration
 
-|    Option     |                    Description                    | Required | Default |
-| :-----------: | :-----------------------------------------------: | :------: | :-----: |
-| `database_id` | Set this to the id of your remote notion database |   true   |    -    |
-|  `token_v2`   |        Set this to your notion `token_v2` (Required only for private databases)         |  false   |    -    |
+|    Option     |                               Description                                | Required | Default |
+| :-----------: | :----------------------------------------------------------------------: | :------: | :-----: |
+| `database_id` |            Set this to the id of your remote notion database             |   true   |    -    |
+|  `token_v2`   | Set this to your notion `token_v2` (Required only for private databases) |  false   |    -    |
 
 ## Usage
 
@@ -97,7 +97,7 @@ Follow the steps below to obtain your `token_v2`:
 2. Go to the Application > Cookies section.
 3. There you'll find a `token_v2` cookie.
 
-**NOTE**: Its highly recommended to store your `token_v2` as a github secret rather than pasting it in your workflow file.
+**NOTE**: Its highly recommended to store your `token_v2` as a github secret rather than pasting it in your workflow file. And if you want to embed it in your workflow file make sure unauthorized sources can't access/view it.
 
 #### 2. Create a github secret to store `token_v2`
 
