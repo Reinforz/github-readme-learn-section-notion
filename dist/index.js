@@ -1545,18 +1545,22 @@ const ColorMap = {
     red: '9f5c58',
     teal: '467870'
 };
-const constructNewContents = (categories_map, color_schema_unit_key) => {
+const constructNewContents = (categoriesMap, colorSchemaUnitKey, base64SchemaUnitKey) => {
     const newContents = [];
-    for (const [category, category_info] of categories_map) {
+    for (const [category, categoryInfo] of categoriesMap) {
         const content = [
-            `<h3><img height="20px" src="https://img.shields.io/badge/${external_querystring_default().escape(category)}-${ColorMap[category_info.color]}"/></h3>`
+            `<h3><img height="20px" src="https://img.shields.io/badge/${external_querystring_default().escape(category)}-${ColorMap[categoryInfo.color]}"/></h3>`
         ];
-        category_info.items.forEach((item) => {
-            var _a, _b;
+        categoryInfo.items.forEach((item) => {
+            var _a, _b, _c;
             const title = item.title && item.title[0][0];
             if (!title)
                 throw new Error(`Each row must have value in the Name column`);
-            content.push(`<span><img src="https://img.shields.io/badge/-${external_querystring_default().escape(title)}-${(_b = (_a = item[color_schema_unit_key]) === null || _a === void 0 ? void 0 : _a[0][0]) !== null && _b !== void 0 ? _b : 'black'}?style=flat-square&amp;logo=${external_querystring_default().escape(title)}" alt="${title}"/></span>`);
+            let logo = external_querystring_default().escape(title);
+            if ((_a = item[base64SchemaUnitKey]) === null || _a === void 0 ? void 0 : _a[0][0]) {
+                logo = item[base64SchemaUnitKey][0][0];
+            }
+            content.push(`<span><img src="https://img.shields.io/badge/-${external_querystring_default().escape(title)}-${(_c = (_b = item[colorSchemaUnitKey]) === null || _b === void 0 ? void 0 : _b[0][0]) !== null && _c !== void 0 ? _c : 'black'}?style=flat-square&amp;logo=${logo}" alt="${title}"/></span>`);
         });
         newContents.push(...content, '<hr>');
     }
@@ -1595,20 +1599,36 @@ const fetchData = (id, table, http) => fetchData_awaiter(void 0, void 0, void 0,
 ;// CONCATENATED MODULE: ./src/utils/getSchemaEntries.ts
 
 const getSchemaEntries = (schema) => {
-    const schema_entries = Object.entries(schema), category_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'select' &&
-        schema_entry_value.name === 'Category'), name_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'title' &&
-        schema_entry_value.name === 'Name'), color_schema_entry = schema_entries.find(([, schema_entry_value]) => schema_entry_value.type === 'text' &&
-        schema_entry_value.name === 'Color');
-    if (!category_schema_entry)
+    const schemaEntries = Object.entries(schema);
+    let categorySchemaEntry = undefined, nameSchemaEntry = undefined, colorSchemaEntry = undefined, base64SchemaEntry = undefined;
+    schemaEntries.forEach((schemaEntry) => {
+        if (schemaEntry[1].type === 'text' && schemaEntry[1].name === 'Color') {
+            colorSchemaEntry = schemaEntry;
+        }
+        else if (schemaEntry[1].type === 'title' &&
+            schemaEntry[1].name === 'Name') {
+            nameSchemaEntry = schemaEntry;
+        }
+        else if (schemaEntry[1].type === 'select' &&
+            schemaEntry[1].name === 'Category') {
+            categorySchemaEntry = schemaEntry;
+        }
+        else if (schemaEntry[1].type === 'text' &&
+            schemaEntry[1].name === 'Base64') {
+            base64SchemaEntry = schemaEntry;
+        }
+    });
+    if (!categorySchemaEntry)
         core.setFailed("Couldn't find Category named select type column in the database");
-    if (!color_schema_entry)
+    if (!nameSchemaEntry)
         core.setFailed("Couldn't find Color named text type column in the database");
-    if (!name_schema_entry)
+    if (!colorSchemaEntry)
         core.setFailed("Couldn't find Name named title type column in the database");
     return [
-        category_schema_entry,
-        color_schema_entry,
-        name_schema_entry
+        categorySchemaEntry,
+        colorSchemaEntry,
+        nameSchemaEntry,
+        base64SchemaEntry
     ];
 };
 
@@ -1708,15 +1728,15 @@ function action() {
             const { recordMap } = JSON.parse(yield response.readBody());
             core.info('Fetched rows');
             const { schema } = collection;
-            const [category_schema_entry, color_schema_entry] = ActionUtils.getSchemaEntries(schema);
+            const [categorySchemaEntry, colorSchemaEntry, , base64SchemaEntry] = ActionUtils.getSchemaEntries(schema);
             const rows = ActionUtils.modifyRows(recordMap, databaseId);
-            const categories_map = ActionUtils.constructCategoriesMap(category_schema_entry[1]);
-            ActionUtils.populateCategoriesMapItems(rows, category_schema_entry[0], categories_map);
+            const categoriesMap = ActionUtils.constructCategoriesMap(categorySchemaEntry[1]);
+            ActionUtils.populateCategoriesMapItems(rows, categorySchemaEntry[0], categoriesMap);
             const README_PATH = `${process.env.GITHUB_WORKSPACE}/README.md`;
             core.info(`Reading from ${README_PATH}`);
             const readmeLines = external_fs_default().readFileSync(README_PATH, 'utf-8').split('\n');
             const [startIdx, endIdx] = ActionUtils.checkForSections(readmeLines);
-            const newLines = ActionUtils.constructNewContents(categories_map, color_schema_entry[0]);
+            const newLines = ActionUtils.constructNewContents(categoriesMap, colorSchemaEntry[0], base64SchemaEntry[0]);
             const finalLines = [
                 ...readmeLines.slice(0, startIdx + 1),
                 ...newLines,
