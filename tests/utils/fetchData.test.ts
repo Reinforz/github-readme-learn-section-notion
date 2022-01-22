@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { NotionEndpoints } from '@nishans/endpoints';
+import { HttpClient } from '@actions/http-client';
 import { fetchData } from '../../src/utils/fetchData';
 
 afterEach(() => {
@@ -7,34 +7,37 @@ afterEach(() => {
 });
 
 it(`Should fetch data successfully`, async () => {
-  const fetInputMock = jest
-    .spyOn(core, 'getInput')
-    .mockImplementationOnce(() => 'token_v2');
+  let http = new HttpClient();
+
   const syncRecordValuesMock = jest
-    .spyOn(NotionEndpoints.Queries, 'syncRecordValues')
+    .spyOn(http, 'post' as any)
     .mockImplementationOnce(async () => {
       return {
-        recordMap: {
-          block: {
-            block_1: {
-              role: 'comment_only',
-              value: {
-                id: 'block_1'
+        async readBody() {
+          return JSON.stringify({
+            recordMap: {
+              block: {
+                block_1: {
+                  role: 'comment_only',
+                  value: {
+                    id: 'block_1'
+                  }
+                }
               }
             }
-          } as any
+          });
         }
       };
     });
 
-  const data = await fetchData('block_1', 'block');
+  const data = await fetchData('block_1', 'block', http);
 
-  expect(fetInputMock).toHaveBeenCalledWith('token_v2');
   expect(data).toStrictEqual({
     id: 'block_1'
   });
   expect(syncRecordValuesMock).toHaveBeenCalledWith(
-    {
+    `https://www.notion.so/api/v3/syncRecordValues`,
+    JSON.stringify({
       requests: [
         {
           id: 'block_1',
@@ -42,39 +45,37 @@ it(`Should fetch data successfully`, async () => {
           version: -1
         }
       ]
-    },
-    {
-      token: 'token_v2',
-      user_id: ''
-    }
+    })
   );
 });
 
 it(`Should not fetch data`, async () => {
-  const fetInputMock = jest
-    .spyOn(core, 'getInput')
-    .mockImplementationOnce(() => 'token_v2');
+  let http = new HttpClient();
   const setFailed = jest.spyOn(core, 'setFailed');
   const syncRecordValuesMock = jest
-    .spyOn(NotionEndpoints.Queries, 'syncRecordValues')
+    .spyOn(http, 'post' as any)
     .mockImplementationOnce(async () => {
       return {
-        recordMap: {
-          block: {
-            block_1: {
-              role: 'comment_only'
+        async readBody() {
+          return JSON.stringify({
+            recordMap: {
+              block: {
+                block_1: {
+                  role: 'comment_only'
+                }
+              } as any
             }
-          } as any
+          });
         }
       };
     });
 
-  const data = await fetchData('block_1', 'block');
+  const data = await fetchData('block_1', 'block', http);
 
-  expect(fetInputMock).toHaveBeenCalledWith('token_v2');
   expect(data).toStrictEqual(undefined);
   expect(syncRecordValuesMock).toHaveBeenCalledWith(
-    {
+    `https://www.notion.so/api/v3/syncRecordValues`,
+    JSON.stringify({
       requests: [
         {
           id: 'block_1',
@@ -82,11 +83,7 @@ it(`Should not fetch data`, async () => {
           version: -1
         }
       ]
-    },
-    {
-      token: 'token_v2',
-      user_id: ''
-    }
+    })
   );
   expect(setFailed).toHaveBeenCalledWith(
     `Either your NOTION_TOKEN_V2 has expired or a block with id:block_1 doesn't exist`
