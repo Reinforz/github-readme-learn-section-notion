@@ -109,7 +109,8 @@ it(`Should work`, async () => {
     return [
       ['category', category_schema_unit],
       ['color', { name: 'Color', type: 'text' }],
-      ['title', { name: 'Name', type: 'title' }]
+      ['title', { name: 'Name', type: 'title' }],
+      ['base64', { name: 'Base64', type: 'text' }]
     ];
   });
 
